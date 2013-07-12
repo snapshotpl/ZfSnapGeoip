@@ -1,0 +1,40 @@
+{
+    "name": "snapshotpl/zf-snap-geoip",
+    "description": "MaxMind GeoIP Module for Zend Framework 2",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "geoip",
+        "zf2",
+        "maxmind"
+    ],
+    "authors": [
+        {
+            "name": "Witold Wasiczko",
+            "email": "witold@wasiczko.pl",
+            "homepage": "http://www.psd2html.pl/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zend-console": "2.2.*",
+        "zendframework/zend-view": "2.2.*",
+        "zendframework/zend-modulemanager": "2.2.*",
+        "geoip/geoip": "1.13"
+    },
+    "autoload": {
+        "psr-0": {
+            "ZfSnapGeoip": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "ZfSnapGeoip\\Composer::downloadData"
+        ],
+        "post-update-cmd": [
+            "ZfSnapGeoip\\Composer::downloadData"
+        ]
+    }
+}
