@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Composer scripts
+ * Composer script handler
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
 
-namespace ZfSnapGeoip;
+namespace ZfSnapGeoip\Composer;
 
 use Composer\Script\Event;
 
-class Composer
+class ScriptHandler
 {
     const ZEND_INDEX_PATH = 'zend-index-path';
 

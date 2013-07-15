@@ -32,10 +32,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "ZfSnapGeoip\\Composer::downloadData"
+            "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
         ],
         "post-update-cmd": [
-            "ZfSnapGeoip\\Composer::downloadData"
+            "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
         ]
     }
 }
