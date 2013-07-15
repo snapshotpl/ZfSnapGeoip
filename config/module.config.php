@@ -26,13 +26,7 @@ return array(
 
     'view_helpers' => array(
         'factories' => array(
-            'geoip' => function ($pm) {
-                $sm = $pm->getServiceLocator();
-                $geoip = $sm->get('geoip');
-                $helper = new ZfSnapGeoip\View\Helper\Geoip($geoip);
-
-                return $helper;
-            },
+            'geoip' => 'ZfSnapGeoip\View\Helper\GeoipFactory'
         ),
     ),
 
