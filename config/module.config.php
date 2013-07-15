@@ -7,26 +7,19 @@ return array(
             'destination' => __DIR__ . '/../data/',
             'filename' => 'GeoLiteCity.dat',
             'flag' => GEOIP_STANDARD,
-            'regionvars' => __DIR__ .'/../../../vendor/geoip/geoip/geoipregionvars.php'
+            'regionvars' => __DIR__ .'/../../../vendor/geoip/geoip/geoipregionvars.php',
         ),
     ),
 
     'service_manager' => array(
         'factories' => array(
-            'geoip' => function ($sm) {
-                $config = $sm->get('config');
-                $request = $sm->get('request');
-                $service = new ZfSnapGeoip\Service\Geoip($config['maxmind']['database']);
-                $service->setIp($request->getServer('REMOTE_ADDR'));
-
-                return $service;
-            },
+            'geoip' => 'ZfSnapGeoip\Service\GeoipFactory',
         ),
     ),
 
     'view_helpers' => array(
         'factories' => array(
-            'geoip' => 'ZfSnapGeoip\View\Helper\GeoipFactory'
+            'geoip' => 'ZfSnapGeoip\View\Helper\GeoipFactory',
         ),
     ),
 
@@ -44,7 +37,7 @@ return array(
                         'route' => ZfSnapGeoip\Module::CONSOLE_GEOIP_DOWNLOAD,
                         'defaults' => array(
                             'controller' => 'ZfSnapGeoip\Controller\Console',
-                            'action' => 'download'
+                            'action' => 'download',
                         )
                     )
                 )
