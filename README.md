@@ -75,13 +75,15 @@ php index/public.php geoip download
 ```
 Or use autoupdate database during install/update in composer (just add this lines to composer.json and run composer):
 ```json
-"scripts": {
-    "post-install-cmd": [
-        "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
-    ],
-    "post-update-cmd": [
-        "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
-    ]
+{
+    "scripts": {
+       "post-install-cmd": [
+            "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
+        ],
+        "post-update-cmd": [
+            "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
+        ]
+    }
 }
 ```
 
