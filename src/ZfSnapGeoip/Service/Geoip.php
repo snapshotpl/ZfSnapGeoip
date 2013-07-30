@@ -9,6 +9,7 @@
 namespace ZfSnapGeoip\Service;
 
 use \ZfSnapGeoip\Exception\DomainException;
+use \ZfSnapGeoip\IpAwareInterface;
 
 class Geoip
 {
@@ -67,13 +68,14 @@ class Geoip
      */
     public function setIp($ip)
     {
-        if ($ip !== null) {
-            if ($ip instanceof ZfSnapGeoip\IpAwareInterface) {
-                $ip = $ip->getIpAddress();
-            }
-            $this->ip = $ip;
+        if ($ip instanceof IpAwareInterface) {
+            $ip = $ip->getIpAddress();
         }
 
+        if ($ip !== $this->ip) {
+            $this->record = null;
+            $this->ip = $ip;
+        }
         return $this;
     }
 
@@ -101,7 +103,7 @@ class Geoip
             $this->setIp($ip);
         }
 
-        if (!$this->record && $ip !== null) {
+        if (!$this->record || $ip !== $this->ip) {
             $this->record = geoip_record_by_addr($this->getGeoip(), $ip);
         }
 
@@ -193,7 +195,17 @@ class Geoip
     public function getRegionName($ip = null)
     {
         $regions = $this->getRegions();
-        return $regions[$this->getCountryCode($ip)][$this->getRegionCode($ip)];
+        $countryCode = $this->getCountryCode($ip);
+
+        if (isset($regions[$countryCode])) {
+            $regionCodes = $regions[$countryCode];
+            $regionCode = $this->getRegionCode($ip);
+
+            if (isset($regionCodes[$regionCode])) {
+                return $regionCodes[$regionCode];
+            }
+        }
+        return null;
     }
 
     /**
@@ -254,9 +266,9 @@ class Geoip
      * @param string $ip
      * @return string
      */
-    public function getContinentalCode($ip = null)
+    public function getContinentCode($ip = null)
     {
-        return $this->getRecord('continental_code', $ip);
+        return $this->getRecord('continent_code', $ip);
     }
 
     /**
@@ -277,7 +289,7 @@ class Geoip
         return array(
             'areaCode'          => $this->getAreaCode($ip),
             'city'              => $this->getCity($ip),
-            'continentalCode'   => $this->getContinentalCode($ip),
+            'continentalCode'   => $this->getContinentCode($ip),
             'countryCode'       => $this->getCountryCode($ip),
             'countryCode3'      => $this->getCountryCode3($ip),
             'countryName'       => $this->getCountryName($ip),

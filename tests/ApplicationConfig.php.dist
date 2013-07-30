@@ -1,0 +1,9 @@
+<?php
+
+define('ZF2_PATH', getenv('HOME') . '/www/zend2.local/vendor/zendframework/zendframework/library');
+
+return array(
+    'modules' => array(
+        'ZfSnapGeoip',
+    ),
+);

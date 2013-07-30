@@ -19,10 +19,13 @@ class GeoipFactory implements FactoryInterface
         $request = $serviceLocator->get('Request');
 
         $serviceConfig = $config['maxmind']['database'];
-        $currentIp = $request->getServer('REMOTE_ADDR');
 
         $service = new Geoip($serviceConfig);
-        $service->setIp($currentIp);
+
+        if ($request instanceof \Zend\Http\Request) {
+            $currentIp = $request->getServer('REMOTE_ADDR');
+            $service->setIp($currentIp);
+        }
 
         return $service;
     }
