@@ -3,7 +3,7 @@ ZfSnapGeoip
 
 Maxmind Geoip module for Zend Framework 2
 
-Version 0.1.0 Created by Witold Wasiczko
+Version 1.0.0 Created by Witold Wasiczko
 
 Usage
 -----
@@ -90,4 +90,4 @@ Or use autoupdate database during install/update in composer (just add this line
 TODO
 ----
 
-- unit tests
+- refactor service to return simply record object
