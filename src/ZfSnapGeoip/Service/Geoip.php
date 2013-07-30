@@ -82,20 +82,34 @@ class Geoip
     /**
      * @return \GeoIP
      */
-    private function getGeoip()
+    public function getGeoip()
     {
         if (!$this->geoip) {
-            $this->geoip = geoip_open($this->config['destination'] . $this->config['filename'], $this->config['flag']);
+            $config = $this->config;
+            $database = $config['destination'] . $config['filename'];
+            $this->geoip = geoip_open($database, $config['flag']);
         }
         return $this->geoip;
     }
 
     /**
-     * @param string $property
      * @param string $ip
      * @return \geoiprecord
      */
-    private function getRecord($property, $ip = null)
+    public function getRecord($ip = null)
+    {
+        if (!$this->record || $ip !== $this->ip) {
+            $this->record = GeoIP_record_by_addr($this->getGeoip(), $ip);
+        }
+        return $this->record;
+    }
+
+    /**
+     * @param string $property
+     * @param string $ip
+     * @return string
+     */
+    private function getRecordProperty($property, $ip = null)
     {
         if ($ip === null) {
             $ip = $this->ip;
@@ -103,14 +117,11 @@ class Geoip
             $this->setIp($ip);
         }
 
-        if (!$this->record || $ip !== $this->ip) {
-            $this->record = geoip_record_by_addr($this->getGeoip(), $ip);
-        }
+        $record = $this->getRecord($ip);
 
-        if ($this->record !== null && property_exists($this->record, $property)) {
-            return $this->record->{$property};
+        if ($record !== null && property_exists($record, $property)) {
+            return $record->{$property};
         }
-
         return null;
     }
 
@@ -158,7 +169,7 @@ class Geoip
      */
     public function getCountryCode($ip = null)
     {
-        return $this->getRecord('country_code', $ip);
+        return $this->getRecordProperty('country_code', $ip);
     }
 
     /**
@@ -167,7 +178,7 @@ class Geoip
      */
     public function getCountryCode3($ip = null)
     {
-        return $this->getRecord('country_code3', $ip);
+        return $this->getRecordProperty('country_code3', $ip);
     }
 
     /**
@@ -176,7 +187,7 @@ class Geoip
      */
     public function getCountryName($ip = null)
     {
-        return $this->getRecord('country_name', $ip);
+        return $this->getRecordProperty('country_name', $ip);
     }
 
     /**
@@ -185,7 +196,7 @@ class Geoip
      */
     public function getRegionCode($ip = null)
     {
-        return $this->getRecord('region', $ip);
+        return $this->getRecordProperty('region', $ip);
     }
 
     /**
@@ -214,7 +225,7 @@ class Geoip
      */
     public function getPostalCode($ip = null)
     {
-        return $this->getRecord('postal_code', $ip);
+        return $this->getRecordProperty('postal_code', $ip);
     }
 
     /**
@@ -223,7 +234,7 @@ class Geoip
      */
     public function getLatitude($ip = null)
     {
-        return $this->getRecord('latitude', $ip);
+        return $this->getRecordProperty('latitude', $ip);
     }
 
     /**
@@ -232,7 +243,7 @@ class Geoip
      */
     public function getLongitude($ip = null)
     {
-        return $this->getRecord('longitude', $ip);
+        return $this->getRecordProperty('longitude', $ip);
     }
 
     /**
@@ -241,7 +252,7 @@ class Geoip
      */
     public function getMetroCode($ip = null)
     {
-        return $this->getRecord('metro_code', $ip);
+        return $this->getRecordProperty('metro_code', $ip);
     }
 
     /**
@@ -250,7 +261,7 @@ class Geoip
      */
     public function getAreaCode($ip = null)
     {
-        return $this->getRecord('area_code', $ip);
+        return $this->getRecordProperty('area_code', $ip);
     }
 
     /**
@@ -259,7 +270,7 @@ class Geoip
      */
     public function getDmaCode($ip = null)
     {
-        return $this->getRecord('dma_code', $ip);
+        return $this->getRecordProperty('dma_code', $ip);
     }
 
     /**
@@ -268,7 +279,7 @@ class Geoip
      */
     public function getContinentCode($ip = null)
     {
-        return $this->getRecord('continent_code', $ip);
+        return $this->getRecordProperty('continent_code', $ip);
     }
 
     /**
@@ -277,7 +288,7 @@ class Geoip
      */
     public function getCity($ip = null)
     {
-        return $this->getRecord('city', $ip);
+        return $this->getRecordProperty('city', $ip);
     }
 
     /**
