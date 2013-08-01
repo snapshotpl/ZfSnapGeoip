@@ -10,8 +10,9 @@ namespace ZfSnapGeoip\Service;
 
 use \ZfSnapGeoip\Exception\DomainException;
 use \ZfSnapGeoip\IpAwareInterface;
+use \Zend\ServiceManager\ServiceManager;
 
-class Geoip
+class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 {
     /**
      * @var \GeoIP
@@ -19,14 +20,19 @@ class Geoip
     private $geoip;
 
     /**
-     * @var geoiprecord
+     * @var \Zend\ServiceManager\ServiceManager
      */
-    private $record;
+    private $sm;
+
+    /**
+     * @var geoiprecord[]
+     */
+    private $records;
 
     /**
      * @var string
      */
-    private $ip;
+    private $defaultIp;
 
     /**
      * @var array
@@ -39,14 +45,6 @@ class Geoip
     private $regions;
 
     /**
-     * @param array $config
-     */
-    public function __construct(array $config)
-    {
-        $this->config = $config;
-    }
-
-    /**
      * Destructor
      */
     public function __destruct()
@@ -55,39 +53,18 @@ class Geoip
     }
 
     /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string)$this->getCity();
-    }
-
-    /**
-     * @param string $ip|ZfSnapGeoip\IpAwareInterface
-     * @return \ZfSnapGeoip\Service\Geoip
-     */
-    public function setIp($ip)
-    {
-        if ($ip instanceof IpAwareInterface) {
-            $ip = $ip->getIpAddress();
-        }
-
-        if ($ip !== $this->ip) {
-            $this->record = null;
-            $this->ip = $ip;
-        }
-        return $this;
-    }
-
-    /**
      * @return \GeoIP
      */
     public function getGeoip()
     {
         if (!$this->geoip) {
-            $config = $this->config;
+            $config = $this->getConfig();
             $database = $config['destination'] . $config['filename'];
-            $this->geoip = geoip_open($database, $config['flag']);
+            if (file_exists($database)) {
+                $this->geoip = geoip_open($database, $config['flag']);
+            } else {
+                throw new DomainException('You need to download Maxmind database. You can use ZFTool for that :)');
+            }
         }
         return $this->geoip;
     }
@@ -96,33 +73,72 @@ class Geoip
      * @param string $ip
      * @return \geoiprecord
      */
-    public function getRecord($ip = null)
+    public function getGeoipRecord($ip)
     {
-        if (!$this->record || $ip !== $this->ip) {
-            $this->record = GeoIP_record_by_addr($this->getGeoip(), $ip);
+        $ip = $this->getIp($ip);
+
+        if (!isset($this->records[$ip])) {
+            $record = GeoIP_record_by_addr($this->getGeoip(), $ip);
+            $this->records[$ip] = $record;
         }
-        return $this->record;
+
+        return $this->records[$ip];
     }
 
     /**
-     * @param string $property
      * @param string $ip
      * @return string
      */
-    private function getRecordProperty($property, $ip = null)
+    private function getIp($ip)
     {
         if ($ip === null) {
-            $ip = $this->ip;
-        } else {
-            $this->setIp($ip);
+            $ip = $this->getDefaultIp();
         }
 
-        $record = $this->getRecord($ip);
-
-        if ($record !== null && property_exists($record, $property)) {
-            return $record->{$property};
+        if ($ip instanceof IpAwareInterface) {
+            $ip = $ip->getIpAddress();
         }
-        return null;
+
+        return $ip;
+    }
+
+    /**
+     * @param string $ip
+     * @return \ZfSnapGeoip\Entity\RecordInterface
+     */
+    public function getRecord($ip = null)
+    {
+        $record = $this->sm->get('geoip_record');
+        /* @var $record \ZfSnapGeoip\Entity\RecordInterface */
+
+        if (!($record instanceof \ZfSnapGeoip\Entity\RecordInterface)) {
+            throw new DomainException('Incorrect record implementation');
+        }
+
+        $geoipRecord = $this->getGeoipRecord($ip);
+
+        if (!($geoipRecord instanceof \geoiprecord)) {
+            return $record;
+        }
+
+        $data = get_object_vars($geoipRecord);
+        $data['region_name'] = $this->getRegionName($data);
+
+        $hydrator = $this->sm->get('geoip_hydrator');
+        /* @var $hydrator \Zend\Stdlib\Hydrator\HydratorInterface */
+
+        $hydrator->hydrate($data, $record);
+
+        return $record;
+    }
+
+    /**
+     * @param string $ip
+     * @return \ZfSnapGeoip\Entity\RecordInterface
+     */
+    public function lookup($ip = null)
+    {
+        return $this->getRecord($ip);
     }
 
     /**
@@ -132,8 +148,8 @@ class Geoip
     {
         if ($this->geoip) {
             geoip_close($this->geoip);
+            $this->geoip = null;
         }
-
         return $this;
     }
 
@@ -143,7 +159,8 @@ class Geoip
     private function getRegions()
     {
         if (!$this->regions) {
-            $regionVarPath = $this->config['regionvars'];
+            $config = $this->getConfig();
+            $regionVarPath = $config['regionvars'];
             include($regionVarPath);
 
             if (!isset($GEOIP_REGION_NAME)) {
@@ -156,61 +173,50 @@ class Geoip
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getIp()
+    private function getConfig()
     {
-        return $this->ip;
+        if (!$this->config) {
+            $config = $this->sm->get('Config');
+            $this->config = $config['maxmind']['database'];;
+        }
+        return $this->config;
+    }
+
+    /**
+     *
+     * @return $string|null
+     */
+    private function getDefaultIp()
+    {
+        if ($this->defaultIp === null) {
+            $request = $this->sm->get('Request');
+
+            if ($request instanceof \Zend\Http\Request) {
+                $ip = $request->getServer('REMOTE_ADDR');
+                $this->defaultIp = $ip;
+            } else {
+                $this->defaultIp = false;
+                return null;
+            }
+        }
+
+        return $this->defaultIp;
     }
 
     /**
      * @param string $ip
      * @return string
      */
-    public function getCountryCode($ip = null)
-    {
-        return $this->getRecordProperty('country_code', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getCountryCode3($ip = null)
-    {
-        return $this->getRecordProperty('country_code3', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getCountryName($ip = null)
-    {
-        return $this->getRecordProperty('country_name', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getRegionCode($ip = null)
-    {
-        return $this->getRecordProperty('region', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getRegionName($ip = null)
+    private function getRegionName(array $data = array())
     {
         $regions = $this->getRegions();
-        $countryCode = $this->getCountryCode($ip);
+        $countryCode = isset($data['country_code']) ? $data['country_code'] : null;
 
         if (isset($regions[$countryCode])) {
             $regionCodes = $regions[$countryCode];
-            $regionCode = $this->getRegionCode($ip);
+            $regionCode = isset($data['region']) ? $data['region'] : null;
 
             if (isset($regionCodes[$regionCode])) {
                 return $regionCodes[$regionCode];
@@ -220,97 +226,10 @@ class Geoip
     }
 
     /**
-     * @param string $ip
-     * @return string
+     * @param \Zend\ServiceManager\ServiceManager $serviceManager
      */
-    public function getPostalCode($ip = null)
+    public function setServiceManager(ServiceManager $serviceManager)
     {
-        return $this->getRecordProperty('postal_code', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return float
-     */
-    public function getLatitude($ip = null)
-    {
-        return $this->getRecordProperty('latitude', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return float
-     */
-    public function getLongitude($ip = null)
-    {
-        return $this->getRecordProperty('longitude', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return float
-     */
-    public function getMetroCode($ip = null)
-    {
-        return $this->getRecordProperty('metro_code', $ip);
-    }
-
-    /**
-     * @param type $ip
-     * @return int
-     */
-    public function getAreaCode($ip = null)
-    {
-        return $this->getRecordProperty('area_code', $ip);
-    }
-
-    /**
-     * @param type $ip
-     * @return int
-     */
-    public function getDmaCode($ip = null)
-    {
-        return $this->getRecordProperty('dma_code', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getContinentCode($ip = null)
-    {
-        return $this->getRecordProperty('continent_code', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return string
-     */
-    public function getCity($ip = null)
-    {
-        return $this->getRecordProperty('city', $ip);
-    }
-
-    /**
-     * @param string $ip
-     * @return array
-     */
-    public function toArray($ip = null)
-    {
-        return array(
-            'areaCode'          => $this->getAreaCode($ip),
-            'city'              => $this->getCity($ip),
-            'continentalCode'   => $this->getContinentCode($ip),
-            'countryCode'       => $this->getCountryCode($ip),
-            'countryCode3'      => $this->getCountryCode3($ip),
-            'countryName'       => $this->getCountryName($ip),
-            'dmaCode'           => $this->getDmaCode($ip),
-            'latitude'          => $this->getLatitude($ip),
-            'longitude'         => $this->getLongitude($ip),
-            'metroCode'         => $this->getMetroCode($ip),
-            'postalCode'        => $this->getPostalCode($ip),
-            'regionCode'        => $this->getRegionCode($ip),
-            'regionName'        => $this->getRegionName($ip),
-        );
+        $this->sm = $serviceManager;
     }
 }

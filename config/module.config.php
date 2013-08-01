@@ -12,14 +12,19 @@ return array(
     ),
 
     'service_manager' => array(
-        'factories' => array(
-            'geoip' => 'ZfSnapGeoip\Service\GeoipFactory',
+        'invokables' => array(
+            'geoip' => 'ZfSnapGeoip\Service\Geoip',
+            'geoip_record' => 'ZfSnapGeoip\Entity\Record',
+            'geoip_hydrator' => 'Zend\Stdlib\Hydrator\ClassMethods',
+        ),
+        'shared' => array(
+            'geoip_record' => false,
         ),
     ),
 
     'view_helpers' => array(
-        'factories' => array(
-            'geoip' => 'ZfSnapGeoip\View\Helper\GeoipFactory',
+        'invokables' => array(
+            'geoip' => 'ZfSnapGeoip\View\Helper\Geoip',
         ),
     ),
 

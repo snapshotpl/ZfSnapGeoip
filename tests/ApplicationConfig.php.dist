@@ -6,4 +6,9 @@ return array(
     'modules' => array(
         'ZfSnapGeoip',
     ),
+    'module_listener_options' => array(
+        'config_glob_paths' => array(
+            'config/{,*.}tests.php',
+        ),
+    ),
 );

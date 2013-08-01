@@ -2,7 +2,6 @@
 
 namespace ZfSnapGeoipTest\Service;
 
-use \ZfSnapGeoip\Service\Geoip;
 use \ZfSnapGeoipTest\Bootstrap;
 
 /**
@@ -36,140 +35,93 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
         $this->sm = Bootstrap::getServiceManager();
         $this->assertInstanceOf('\Zend\ServiceManager\ServiceManager', $this->sm);
 
-        $config = $this->sm->get('Config');
-
-        $config['maxmind']['database']['regionvars'] = __DIR__ .'/../../../vendor/geoip/geoip/geoipregionvars.php';
-
-        $geoip = new Geoip($config['maxmind']['database']);
+        $geoip = $this->sm->get('geoip');
         $this->geoip = $geoip;
         $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $geoip);
     }
 
-    protected function tearDown()
-    {
-        $this->geoip->setIp(null);
-    }
-
-    public function testIp()
-    {
-        $this->ipTest();
-    }
-
-    public function testIpViaInterface()
-    {
-        $this->ipTest(function ($ip) {
-            return $this->getIpAwareInterfaceImplementation($ip);
-        });
-    }
-
     public function testCountryCode()
     {
-        $serviceTrue = $this->getServiceWithTrueIp();
-        $this->assertEquals('US', $serviceTrue->getCountryCode());
+        $recordLocal = $this->getRecordWithLocalIp();
+        $this->assertNull($recordLocal->getCountryCode());
 
-        $serviceLocal = $this->getServiceWithLocalIp();
-        $this->assertNull($serviceLocal->getCountryCode());
+        $recordTrue = $this->getRecordWithTrueIp();
+        $this->assertEquals('US', $recordTrue->getCountryCode());
 
-        $serviceTrueSecond = $this->getServiceWithTrueIp();
-        $this->assertEquals('US', $serviceTrueSecond->getCountryCode());
+
+
+        $recordTrueSecond = $this->getRecordWithTrueIp();
+        $this->assertEquals('US', $recordTrueSecond->getCountryCode());
     }
 
     public function testCountryCodeArgument()
     {
-        $this->assertEquals('US', $this->geoip->getCountryCode($this->ip['google']));
-        $this->assertNull($this->geoip->getCountryCode($this->ip['local']));
-        $this->assertEquals('US', $this->geoip->getCountryCode($this->ip['google']));
+        $this->assertEquals('US', $this->geoip->getRecord($this->ip['google'])->getCountryCode());
+        $this->assertNull($this->geoip->getRecord($this->ip['local'])->getCountryCode());
+        $this->assertEquals('US', $this->geoip->getRecord($this->ip['google'])->getCountryCode());
     }
 
     public function testCityTrue()
     {
-        $service = $this->getServiceWithTrueIp();
+        $record = $this->getRecordWithTrueIp();
 
-        $this->assertEquals('Mountain View', $service->getCity());
-        $this->assertEquals('Mountain View', (string)$service);
+        $this->assertEquals('Mountain View', $record->getCity());
+        $this->assertEquals('Mountain View', (string)$record);
     }
 
     public function testCity()
     {
-        $service = $this->getServiceWithLocalIp();
+        $record = $this->getRecordWithLocalIp();
 
-        $this->assertEquals(null, $service->getCity());
-        $this->assertEquals('', (string) $service);
+        $this->assertEquals(null, $record->getCity());
+        $this->assertEquals('', (string) $record);
     }
 
     public function testGeoPosition()
     {
-        $service = $this->getServiceWithTrueIp();
+        $record = $this->getRecordWithTrueIp();
 
-        $this->assertTrue(is_double($service->getLatitude()));
-        $this->assertTrue(is_double($service->getLongitude()));
+        $this->assertTrue(is_double($record->getLatitude()));
+        $this->assertTrue(is_double($record->getLongitude()));
     }
 
     public function testRegionNameTrue()
     {
-        $service = $this->getServiceWithTrueIp();
+        $record = $this->getRecordWithTrueIp();
 
-        $this->assertEquals('California', $service->getRegionName());
+        $this->assertEquals('California', $record->getRegionName());
     }
 
     public function testRegionNameFalse()
     {
-        $service = $this->getServiceWithLocalIp();
+        $record = $this->getRecordWithLocalIp();
 
-        $this->assertNull($service->getRegionName());
+        $this->assertNull($record->getRegionName());
+    }
+
+    public function testIpAwareInterface()
+    {
+        $localImplement = $this->getIpAwareInterfaceImplementation($this->ip['local']);
+        $this->assertNull($this->geoip->getRecord($localImplement)->getCity());
+
+        $publicImplement = $this->getIpAwareInterfaceImplementation($this->ip['google']);
+        $this->assertEquals('Mountain View', $this->geoip->getRecord($publicImplement)->getCity());
     }
 
     /**
-     * @return ZfSnapGeoip\Service\Geoip
+     * @return \ZfSnapGeoip\Entity\RecordInterface
      */
-    private function getServiceWithTrueIp()
+    private function getRecordWithTrueIp()
     {
-        return $this->geoip->setIp($this->ip['google']);
+        return $this->geoip->getRecord($this->ip['google']);
     }
 
     /**
-     * @return ZfSnapGeoip\Service\Geoip
+     * @return \ZfSnapGeoip\Entity\RecordInterface
      */
-    private function getServiceWithLocalIp()
+    private function getRecordWithLocalIp()
     {
-        return $this->geoip->setIp($this->ip['local']);
-    }
-
-    private function ipTest($builder = null)
-    {
-        $ips = $this->ip;
-
-        $ipLocal = $ips['local'];
-        $ipGoogle = $ips['google'];
-
-        if (is_callable($builder)) {
-            foreach ($ips as &$ip) {
-                $ip = $builder($ip);
-            }
-        }
-
-        $ipLocalInterface = $ips['local'];
-        $ipGoogleInterface = $ips['google'];
-
-        $service = $this->geoip;
-
-        $this->assertNull($service->getIp());
-
-        $service->setIp($ipLocalInterface);
-        $this->assertEquals($service->getIp(), $ipLocal);
-
-        $service->setIp(null);
-        $this->assertNull($service->getIp());
-
-        $service->setIp($ipLocalInterface);
-        $this->assertEquals($service->getIp(), $ipLocal);
-
-        $this->assertEquals($service->getIp(), $ipLocal);
-        $this->assertNotEquals($service->getIp(), $ipGoogle);
-
-        $service->setIp($ipGoogleInterface);
-        $this->assertEquals($service->getIp(), $ipGoogle);
-        $this->assertNotEquals($service->getIp(), $ipLocal);
+        return $this->geoip->getRecord($this->ip['local']);
     }
 
     private function getIpAwareInterfaceImplementation($ip)

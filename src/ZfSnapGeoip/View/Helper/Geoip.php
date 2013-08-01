@@ -9,9 +9,10 @@
 namespace ZfSnapGeoip\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
-use ZfSnapGeoip\Service\Geoip as Service;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
-class Geoip extends AbstractHelper
+class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
 {
     /**
      * @var ZfSnapGeoip\Service\Geoip
@@ -19,12 +20,10 @@ class Geoip extends AbstractHelper
     private $geoip;
 
     /**
-     * @param \ZfSnapGeoip\Service\Geoip $geoip
+     *
+     * @var \Zend\ServiceManager\ServiceLocatorInterface
      */
-    public function __construct(Service $geoip)
-    {
-        $this->geoip = $geoip;
-    }
+    private $sl;
 
     /**
      * @param string $ip
@@ -32,7 +31,7 @@ class Geoip extends AbstractHelper
      */
     public function __invoke($ip = null)
     {
-        return $this->geoip->setIp($ip);
+        return $this->getGeoip()->getRecord($ip);
     }
 
     /**
@@ -40,6 +39,24 @@ class Geoip extends AbstractHelper
      */
     public function __toString()
     {
-        return (string)$this->geoip;
+        return (string)$this->getGeoip()->getRecord();
+    }
+
+    private function getGeoip()
+    {
+        if (!$this->geoip) {
+            $this->geoip = $this->sl->getServiceLocator()->get('Geoip');
+        }
+        return $this->geoip;
+    }
+
+    public function getServiceLocator()
+    {
+        return $this->sl;
+    }
+
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->sl = $serviceLocator;
     }
 }
