@@ -7,7 +7,7 @@ return array(
             'destination' => __DIR__ . '/../data/',
             'filename' => 'GeoLiteCity.dat',
             'flag' => GEOIP_STANDARD,
-            'regionvars' => __DIR__ .'/../../../vendor/geoip/geoip/geoipregionvars.php',
+            'regionvars' => __DIR__ .'/../../../geoip/geoip/geoipregionvars.php',
         ),
     ),
 
