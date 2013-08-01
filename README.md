@@ -3,20 +3,26 @@ ZfSnapGeoip
 
 Maxmind Geoip module for Zend Framework 2
 
-Version 1.0.0 Created by Witold Wasiczko
+Version 2.0.0 Created by Witold Wasiczko
 
 Usage
 -----
-Default ZfSnapGeoip uses current IP address.
+Default ZfSnapGeoip returns Record object created by current user's IP address.
 
 **In controller:**
 
 ```php
-$geoip = $this->getServiceLocator()->get('geoip');
-$geoip->getCity();
+$record = $this->getServiceLocator()->get('geoip')->getRecord();
+echo $record->getCity();
 ```
 
-**In view:**
+```php
+$record = $this->getServiceLocator()->get('geoip')->getRecord('216.239.51.99');
+echo $record->getLongitude();
+echo $record->getLatitude();
+```
+
+**By view helper:**
 
 Returns city name for current IP:
 ```php
@@ -27,20 +33,16 @@ Returns country name for given IP:
 <?php echo $this->geoip('184.106.35.179')->getCountryName() ?>
 ```
 
-You can also implements ZfSnapGeoip\IpAwareInterface interface and then use instance in service/helper:
+You can also implements \ZfSnapGeoip\IpAwareInterface interface and then use instance in service/helper:
 ```php
 <?php echo $this->geoip($user)->getRegionName() ?>
 ```
-Or
-```php
-<?php echo $geoip->getRegionName($user) ?>
-```
 
-All avaliable methods:
+Avaliable methods via \ZfSnapGeoip\Entity\Interface:
 ```
 getAreaCode()
 getCity()
-getContinentalCode()
+getContinentCode()
 getCountryCode()
 getCountryCode3()
 getCountryName()
@@ -49,13 +51,21 @@ getLatitude()
 getLongitude()
 getMetroCode()
 getPostalCode()
-getRegionCode()
+getRegion()
 getRegionName()
-```
-
-Get all data to array:
-```php
-toArray()
+setAreaCode($data)
+setCity($data)
+setContinentCode($data)
+setCountryCode($data)
+setCountryCode3($data)
+setCountryName($data)
+setDmaCode($data)
+setLatitude($data)
+setLongitude($data)
+setMetroCode($data)
+setPostalCode($data)
+setRegion($data)
+setRegionName($data)
 ```
 
 How to install?
@@ -77,7 +87,7 @@ Or use autoupdate database during install/update in composer (just add this line
 ```json
 {
     "scripts": {
-       "post-install-cmd": [
+        "post-install-cmd": [
             "ZfSnapGeoip\\Composer\\ScriptHandler::downloadData"
         ],
         "post-update-cmd": [
@@ -86,8 +96,3 @@ Or use autoupdate database during install/update in composer (just add this line
     }
 }
 ```
-
-TODO
-----
-
-- refactor service to return simply record object
