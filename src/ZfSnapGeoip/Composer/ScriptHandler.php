@@ -27,7 +27,11 @@ class ScriptHandler
 
         $zendIndexPath = $options[self::ZEND_INDEX_PATH];
 
-        $cmd = sprintf('php %s %s', $zendIndexPath, 'geoip download');
+        if ($event->getName() === 'post-install-cmd') {
+            $cmd = sprintf('php %s %s', $zendIndexPath, 'geoip download');
+        } else {
+            $cmd = sprintf('php %s %s', $zendIndexPath, 'geoip download --override');
+        }
         system($cmd);
     }
 }

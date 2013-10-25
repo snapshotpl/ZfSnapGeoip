@@ -15,8 +15,6 @@ class ConsoleController extends AbstractActionController
 {
     /**
      * Download GeoIP data via console
-     *
-     * @return type
      */
     public function downloadAction()
     {
@@ -32,6 +30,11 @@ class ConsoleController extends AbstractActionController
         $destination = $databaseConfig['destination'];
         $gzFilename = basename($source);
         $datFilename = $databaseConfig['filename'];
+
+        if (!$this->getRequest()->getParam('override') && is_file($destination . $datFilename)) {
+            $console->writeline('Database already exist. Skipping...');
+            return;
+        }
 
         /* @var $console Zend\Console\Adapter\AdapterInterface */
         $console->writeLine(sprintf('Downloading %s...', $source));

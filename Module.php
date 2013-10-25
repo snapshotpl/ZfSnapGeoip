@@ -13,7 +13,7 @@ use Zend\Console\Adapter\AdapterInterface;
 
 class Module implements ConsoleUsageProviderInterface
 {
-    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download';
+    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--override]';
 
     public function getConfig()
     {
