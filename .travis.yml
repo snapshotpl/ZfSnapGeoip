@@ -7,5 +7,7 @@ php:
 before_script:
   - wget http://getcomposer.org/composer.phar
   - php composer.phar install
+  - wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -P data/
+  - gunzip -f data/GeoLiteCity.dat.gz
 
 script: phpunit --configuration tests/
