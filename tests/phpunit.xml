@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="Bootstrap.php" colors="true">
-    <testsuites>
-        <testsuite name="ZfSnapGeoip">
-            <directory>./ZfSnapGeoipTest</directory>
-        </testsuite>
-    </testsuites>
+<phpunit bootstrap="bootstrap.php" colors="true">
+    <testsuite name="ZfSnapGeoip">
+        <directory>./</directory>
+    </testsuite>
 </phpunit>
