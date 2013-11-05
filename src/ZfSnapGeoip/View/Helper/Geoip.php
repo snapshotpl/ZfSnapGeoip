@@ -23,15 +23,15 @@ class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
      *
      * @var \Zend\ServiceManager\ServiceLocatorInterface
      */
-    private $sl;
+    private $serviceLocator;
 
     /**
-     * @param string $ip
+     * @param string $ipAddress
      * @return \ZfSnapGeoip\Service\Geoip
      */
-    public function __invoke($ip = null)
+    public function __invoke($ipAddress = null)
     {
-        return $this->getGeoip()->getRecord($ip);
+        return $this->getGeoip()->getRecord($ipAddress);
     }
 
     /**
@@ -45,18 +45,18 @@ class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
     private function getGeoip()
     {
         if (!$this->geoip) {
-            $this->geoip = $this->sl->getServiceLocator()->get('Geoip');
+            $this->geoip = $this->serviceLocator->getServiceLocator()->get('Geoip');
         }
         return $this->geoip;
     }
 
     public function getServiceLocator()
     {
-        return $this->sl;
+        return $this->serviceLocator;
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        $this->sl = $serviceLocator;
+        $this->serviceLocator = $serviceLocator;
     }
 }

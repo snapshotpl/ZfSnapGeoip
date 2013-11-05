@@ -22,7 +22,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     /**
      * @var \Zend\ServiceManager\ServiceManager
      */
-    private $sm;
+    private $serviceManager;
 
     /**
      * @var geoiprecord[]
@@ -70,52 +70,52 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     }
 
     /**
-     * @param string $ip
+     * @param string $ipAddress
      * @return \geoiprecord
      */
-    public function getGeoipRecord($ip)
+    public function getGeoipRecord($ipAddress)
     {
-        $ip = $this->getIp($ip);
+        $ipAddress = $this->getIp($ipAddress);
 
-        if (!isset($this->records[$ip])) {
-            $record = GeoIP_record_by_addr($this->getGeoip(), $ip);
-            $this->records[$ip] = $record;
+        if (!isset($this->records[$ipAddress])) {
+            $record = GeoIP_record_by_addr($this->getGeoip(), $ipAddress);
+            $this->records[$ipAddress] = $record;
         }
 
-        return $this->records[$ip];
+        return $this->records[$ipAddress];
     }
 
     /**
-     * @param string $ip
+     * @param string $ipAddress
      * @return string
      */
-    private function getIp($ip)
+    private function getIp($ipAddress)
     {
-        if ($ip === null) {
-            $ip = $this->getDefaultIp();
+        if ($ipAddress === null) {
+            $ipAddress = $this->getDefaultIp();
         }
 
-        if ($ip instanceof IpAwareInterface) {
-            $ip = $ip->getIpAddress();
+        if ($ipAddress instanceof IpAwareInterface) {
+            $ipAddress = $ipAddress->getIpAddress();
         }
 
-        return $ip;
+        return $ipAddress;
     }
 
     /**
-     * @param string $ip
+     * @param string $ipAdress
      * @return \ZfSnapGeoip\Entity\RecordInterface
      */
-    public function getRecord($ip = null)
+    public function getRecord($ipAdress = null)
     {
-        $record = $this->sm->get('geoip_record');
+        $record = $this->serviceManager->get('geoip_record');
         /* @var $record \ZfSnapGeoip\Entity\RecordInterface */
 
         if (!($record instanceof \ZfSnapGeoip\Entity\RecordInterface)) {
             throw new DomainException('Incorrect record implementation');
         }
 
-        $geoipRecord = $this->getGeoipRecord($ip);
+        $geoipRecord = $this->getGeoipRecord($ipAdress);
 
         if (!($geoipRecord instanceof \geoiprecord)) {
             return $record;
@@ -124,7 +124,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
         $data = get_object_vars($geoipRecord);
         $data['region_name'] = $this->getRegionName($data);
 
-        $hydrator = $this->sm->get('geoip_hydrator');
+        $hydrator = $this->serviceManager->get('geoip_hydrator');
         /* @var $hydrator \Zend\Stdlib\Hydrator\HydratorInterface */
 
         $hydrator->hydrate($data, $record);
@@ -133,12 +133,12 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     }
 
     /**
-     * @param string $ip
+     * @param string $ipAddress
      * @return \ZfSnapGeoip\Entity\RecordInterface
      */
-    public function lookup($ip = null)
+    public function lookup($ipAddress = null)
     {
-        return $this->getRecord($ip);
+        return $this->getRecord($ipAddress);
     }
 
     /**
@@ -178,8 +178,8 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     private function getConfig()
     {
         if (!$this->config) {
-            $config = $this->sm->get('Config');
-            $this->config = $config['maxmind']['database'];;
+            $config = $this->serviceManager->get('Config');
+            $this->config = $config['maxmind']['database'];
         }
         return $this->config;
     }
@@ -191,11 +191,11 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     private function getDefaultIp()
     {
         if ($this->defaultIp === null) {
-            $request = $this->sm->get('Request');
+            $request = $this->serviceManager->get('Request');
 
             if ($request instanceof \Zend\Http\Request) {
-                $ip = $request->getServer('REMOTE_ADDR');
-                $this->defaultIp = $ip;
+                $ipAddress = $request->getServer('REMOTE_ADDR');
+                $this->defaultIp = $ipAddress;
             } else {
                 $this->defaultIp = false;
                 return null;
@@ -230,6 +230,6 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
      */
     public function setServiceManager(ServiceManager $serviceManager)
     {
-        $this->sm = $serviceManager;
+        $this->serviceManager = $serviceManager;
     }
 }

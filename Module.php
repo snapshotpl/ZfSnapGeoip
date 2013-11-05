@@ -31,6 +31,12 @@ class Module implements ConsoleUsageProviderInterface
         );
     }
 
+    /**
+     * @param \Zend\Console\Adapter\AdapterInterface $console
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getConsoleUsage(AdapterInterface $console)
     {
         return array(

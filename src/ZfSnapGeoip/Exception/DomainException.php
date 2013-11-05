@@ -9,4 +9,6 @@
 namespace ZfSnapGeoip\Exception;
 
 class DomainException extends \DomainException
-{}
+{
+
+}

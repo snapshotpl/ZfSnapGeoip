@@ -20,13 +20,13 @@ class ConsoleController extends AbstractActionController
      */
     public function downloadAction()
     {
-        if (!($this->getRequest() instanceof ConsoleRequest)){
+        if (!($this->getRequest() instanceof ConsoleRequest)) {
             throw new \RuntimeException('You can use this action only from a console!');
         }
 
-        $sm = $this->getServiceLocator();
-        $console = $sm->get('Console');
-        $config = $sm->get('Config');
+        $serviceManager = $this->getServiceLocator();
+        $console = $serviceManager->get('Console');
+        $config = $serviceManager->get('Config');
         $databaseConfig = $config['maxmind']['database'];
         $source = $databaseConfig['source'];
         $destination = $databaseConfig['destination'];
