@@ -8,6 +8,7 @@
 
 namespace ZfSnapGeoip\Controller;
 
+use Zend\Console\ColorInterface as Color;
 use Zend\Console\Request as ConsoleRequest;
 use Zend\Mvc\Controller\AbstractActionController;
 
@@ -32,21 +33,21 @@ class ConsoleController extends AbstractActionController
         $datFilename = $databaseConfig['filename'];
 
         if (!$this->getRequest()->getParam('override') && is_file($destination . $datFilename)) {
-            $console->writeline('Database already exist. Skipping...');
+            $console->writeline('Database already exist. Skipping...', Color::RED);
             return;
         }
 
         /* @var $console Zend\Console\Adapter\AdapterInterface */
-        $console->writeLine(sprintf('Downloading %s...', $source));
+        $console->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
 
         if (!copy($source, $destination . $gzFilename)) {
-            $console->writeLine('Error during file download occured');
+            $console->writeLine('Error during file download occured', Color::RED);
             return;
         }
 
-        $console->writeLine('Download completed');
-        $console->writeLine('Unzip the downloading data...');
+        $console->writeLine('Download completed', Color::GREEN);
+        $console->writeLine('Unzip the downloading data...', Color::YELLOW);
         system(sprintf('gunzip -f %s', $destination . $gzFilename));
-        $console->writeLine(sprintf('Unzip completed (%s)', $destination . $datFilename));
+        $console->writeLine(sprintf('Unzip completed (%s)', $destination . $datFilename), Color::GREEN);
     }
 }
