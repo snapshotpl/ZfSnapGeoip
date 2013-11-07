@@ -29,10 +29,10 @@ class ConsoleController extends AbstractActionController
         $databaseConfig = $config['maxmind']['database'];
         $source = $databaseConfig['source'];
         $destination = $databaseConfig['destination'];
-        $gzFilename = basename($source);
-        $datFilename = $databaseConfig['filename'];
+        $datFilePath = $destination . $databaseConfig['filename'];
+        $gzFilePath = $destination . basename($source);
 
-        if (!$this->getRequest()->getParam('override') && is_file($destination . $datFilename)) {
+        if ($this->getRequest()->getParam('no-clobber') && is_file($datFilePath)) {
             $console->writeline('Database already exist. Skipping...', Color::RED);
             return;
         }
@@ -40,14 +40,14 @@ class ConsoleController extends AbstractActionController
         /* @var $console Zend\Console\Adapter\AdapterInterface */
         $console->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
 
-        if (!copy($source, $destination . $gzFilename)) {
+        if (!copy($source, $gzFilePath)) {
             $console->writeLine('Error during file download occured', Color::RED);
             return;
         }
 
         $console->writeLine('Download completed', Color::GREEN);
         $console->writeLine('Unzip the downloading data...', Color::YELLOW);
-        system(sprintf('gunzip -f %s', $destination . $gzFilename));
-        $console->writeLine(sprintf('Unzip completed (%s)', $destination . $datFilename), Color::GREEN);
+        system(sprintf('gunzip -f %s', $gzFilePath));
+        $console->writeLine(sprintf('Unzip completed (%s)', $datFilePath), Color::GREEN);
     }
 }

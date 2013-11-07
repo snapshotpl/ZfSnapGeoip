@@ -13,7 +13,7 @@ use Zend\Console\Adapter\AdapterInterface;
 
 class Module implements ConsoleUsageProviderInterface
 {
-    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--override]';
+    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--no-clobber]';
 
     public function getConfig()
     {
@@ -40,7 +40,7 @@ class Module implements ConsoleUsageProviderInterface
     public function getConsoleUsage(AdapterInterface $console)
     {
         return array(
-            self::CONSOLE_GEOIP_DOWNLOAD => 'Downloads current libs',
+            self::CONSOLE_GEOIP_DOWNLOAD => 'Downloads the newest GeoIP db',
         );
     }
 }
