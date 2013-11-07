@@ -29,8 +29,8 @@ return array(
     ),
 
     'controllers' => array(
-        'invokables' => array(
-            'ZfSnapGeoip\Controller\Console' => 'ZfSnapGeoip\Controller\ConsoleController',
+        'factories' => array(
+            'ZfSnapGeoip\Controller\Console' => 'ZfSnapGeoip\Controller\ConsoleControllerFactory',
         ),
     ),
 

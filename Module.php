@@ -13,7 +13,7 @@ use Zend\Console\Adapter\AdapterInterface;
 
 class Module implements ConsoleUsageProviderInterface
 {
-    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--no-clobber]';
+    const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--no-clobber] [-q]';
 
     public function getConfig()
     {
@@ -41,6 +41,8 @@ class Module implements ConsoleUsageProviderInterface
     {
         return array(
             self::CONSOLE_GEOIP_DOWNLOAD => 'Downloads the newest GeoIP db',
+            '--no-clobber'               => 'Do not overwrite an existing file',
+            '-q'                         => 'Turn off output'
         );
     }
 }
