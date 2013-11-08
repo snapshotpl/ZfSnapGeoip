@@ -8,9 +8,12 @@
 
 namespace ZfSnapGeoip\Service;
 
+use \ZfSnapGeoip\Entity\RecordInterface;
 use \ZfSnapGeoip\Exception\DomainException;
 use \ZfSnapGeoip\IpAwareInterface;
+use \Zend\Http\Request as HttpRequest;
 use \Zend\ServiceManager\ServiceManager;
+use \geoiprecord as GeoipCoreRecord;
 
 class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 {
@@ -20,12 +23,12 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     private $geoip;
 
     /**
-     * @var \Zend\ServiceManager\ServiceManager
+     * @var ServiceManager
      */
     private $serviceManager;
 
     /**
-     * @var geoiprecord[]
+     * @var GeoipCoreRecord[]
      */
     private $records;
 
@@ -58,12 +61,12 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     public function getGeoip()
     {
         if (!$this->geoip) {
-            $config = $this->getConfig();
+            $config   = $this->getConfig();
             $database = $config['destination'] . $config['filename'];
             if (file_exists($database)) {
                 $this->geoip = geoip_open($database, $config['flag']);
             } else {
-                throw new DomainException('You need to download Maxmind database. You can use ZFTool for that :)');
+                throw new DomainException('You need to download Maxmind database. You can use ZFTool or composer.json for that :)');
             }
         }
         return $this->geoip;
@@ -71,15 +74,14 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 
     /**
      * @param string $ipAddress
-     * @return \geoiprecord
+     * @return GeoipCoreRecord
      */
     public function getGeoipRecord($ipAddress)
     {
         $ipAddress = $this->getIp($ipAddress);
 
         if (!isset($this->records[$ipAddress])) {
-            $record = GeoIP_record_by_addr($this->getGeoip(), $ipAddress);
-            $this->records[$ipAddress] = $record;
+            $this->records[$ipAddress] = GeoIP_record_by_addr($this->getGeoip(), $ipAddress);
         }
 
         return $this->records[$ipAddress];
@@ -104,24 +106,24 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 
     /**
      * @param string $ipAdress
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     public function getRecord($ipAdress = null)
     {
         $record = $this->serviceManager->get('geoip_record');
-        /* @var $record \ZfSnapGeoip\Entity\RecordInterface */
+        /* @var $record RecordInterface */
 
-        if (!($record instanceof \ZfSnapGeoip\Entity\RecordInterface)) {
+        if (!$record instanceof RecordInterface) {
             throw new DomainException('Incorrect record implementation');
         }
 
         $geoipRecord = $this->getGeoipRecord($ipAdress);
 
-        if (!($geoipRecord instanceof \geoiprecord)) {
+        if (!$geoipRecord instanceof GeoipCoreRecord) {
             return $record;
         }
 
-        $data = get_object_vars($geoipRecord);
+        $data                = get_object_vars($geoipRecord);
         $data['region_name'] = $this->getRegionName($data);
 
         $hydrator = $this->serviceManager->get('geoip_hydrator');
@@ -134,7 +136,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 
     /**
      * @param string $ipAddress
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     public function lookup($ipAddress = null)
     {
@@ -142,7 +144,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     }
 
     /**
-     * @return \ZfSnapGeoip\Service\Geoip
+     * @return self
      */
     private function closeGeoip()
     {
@@ -158,8 +160,8 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
      */
     private function getRegions()
     {
-        if (!$this->regions) {
-            $config = $this->getConfig();
+        if ($this->regions === null) {
+            $config        = $this->getConfig();
             $regionVarPath = $config['regionvars'];
             include($regionVarPath);
 
@@ -177,8 +179,8 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
      */
     private function getConfig()
     {
-        if (!$this->config) {
-            $config = $this->serviceManager->get('Config');
+        if ($this->config === null) {
+            $config       = $this->serviceManager->get('Config');
             $this->config = $config['maxmind']['database'];
         }
         return $this->config;
@@ -193,8 +195,8 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
         if ($this->defaultIp === null) {
             $request = $this->serviceManager->get('Request');
 
-            if ($request instanceof \Zend\Http\Request) {
-                $ipAddress = $request->getServer('REMOTE_ADDR');
+            if ($request instanceof HttpRequest) {
+                $ipAddress       = $request->getServer('REMOTE_ADDR');
                 $this->defaultIp = $ipAddress;
             } else {
                 $this->defaultIp = false;
@@ -211,12 +213,12 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
      */
     private function getRegionName(array $data = array())
     {
-        $regions = $this->getRegions();
+        $regions     = $this->getRegions();
         $countryCode = isset($data['country_code']) ? $data['country_code'] : null;
 
         if (isset($regions[$countryCode])) {
             $regionCodes = $regions[$countryCode];
-            $regionCode = isset($data['region']) ? $data['region'] : null;
+            $regionCode  = isset($data['region']) ? $data['region'] : null;
 
             if (isset($regionCodes[$regionCode])) {
                 return $regionCodes[$regionCode];
@@ -226,7 +228,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     }
 
     /**
-     * @param \Zend\ServiceManager\ServiceManager $serviceManager
+     * @param ServiceManager $serviceManager
      */
     public function setServiceManager(ServiceManager $serviceManager)
     {

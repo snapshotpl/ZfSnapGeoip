@@ -17,21 +17,22 @@ class ScriptHandler
     /**
      * Run download database file
      *
-     * @param \Composer\Script\Event $event
+     * @param Event $event
      */
     public static function downloadData(Event $event)
     {
-        $options = array_merge(array(
+        $defaultOptions   = array(
             self::ZEND_INDEX_PATH => 'public/index.php',
-        ), $event->getComposer()->getPackage()->getExtra());
-
-        $zendIndexPath = $options[self::ZEND_INDEX_PATH];
+        );
+        $newOptions       = $event->getComposer()->getPackage()->getExtra();
+        $options          = array_merge($defaultOptions, $newOptions);
+        $zendIndexPath    = $options[self::ZEND_INDEX_PATH];
+        $geoipDownloadCmd = 'geoip download';
 
         if ($event->getName() === 'post-install-cmd') {
-            $cmd = sprintf('php %s %s', $zendIndexPath, 'geoip download');
-        } else {
-            $cmd = sprintf('php %s %s', $zendIndexPath, 'geoip download --override');
+            $geoipDownloadCmd .= ' --no-clobber';
         }
+        $cmd = sprintf('php %s %s', $zendIndexPath, $geoipDownloadCmd);
         system($cmd);
     }
 }
