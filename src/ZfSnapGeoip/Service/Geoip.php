@@ -8,12 +8,12 @@
 
 namespace ZfSnapGeoip\Service;
 
-use \ZfSnapGeoip\Entity\RecordInterface;
-use \ZfSnapGeoip\Exception\DomainException;
-use \ZfSnapGeoip\IpAwareInterface;
-use \Zend\Http\Request as HttpRequest;
-use \Zend\ServiceManager\ServiceManager;
-use \geoiprecord as GeoipCoreRecord;
+use ZfSnapGeoip\Entity\RecordInterface;
+use ZfSnapGeoip\Exception\DomainException;
+use ZfSnapGeoip\IpAwareInterface;
+use Zend\Http\Request as HttpRequest;
+use Zend\ServiceManager\ServiceManager;
+use geoiprecord as GeoipCoreRecord;
 
 class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
 {

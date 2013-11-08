@@ -3,8 +3,7 @@
 namespace ZfSnapGeoip\Entity;
 
 /**
- *
- * @author witold
+ * @author Witold Wasiczko <witold@wasiczko.pl>
  */
 interface RecordInterface
 {
