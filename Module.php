@@ -40,9 +40,10 @@ class Module implements ConsoleUsageProviderInterface
     public function getConsoleUsage(AdapterInterface $console)
     {
         return array(
+            'Manage GeoIP database',
             self::CONSOLE_GEOIP_DOWNLOAD => 'Downloads the newest GeoIP db',
-            '--no-clobber'               => 'Do not overwrite an existing file',
-            '-q'                         => 'Turn off output'
+            array('--no-clobber', 'Don\'t overwrite an existing db file'),
+            array('-q', 'Turn off output'),
         );
     }
 }
