@@ -8,6 +8,7 @@
 
 namespace ZfSnapGeoip\Controller;
 
+use ZfSnapGeoip\DatabaseConfig;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\ColorInterface as Color;
 use Zend\Console\Request as ConsoleRequest;
@@ -30,15 +31,15 @@ class ConsoleController extends AbstractActionController
     protected $isQuiet;
 
     /**
-     * @var array
+     * @var DatabaseConfig
      */
     protected $config;
 
     /**
      * @param Console $console
-     * @param array $config
+     * @param DatabaseConfig $config
      */
-    public function __construct(Console $console, array $config)
+    public function __construct(Console $console, DatabaseConfig $config)
     {
         $this->console = $console;
         $this->config  = $config;
@@ -60,16 +61,15 @@ class ConsoleController extends AbstractActionController
      */
     public function downloadAction()
     {
-        $source      = $this->config['source'];
-        $destination = $this->config['destination'];
-        $datFilePath = $destination . $this->config['filename'];
+        $datFilePath = $this->config->getDatabasePath();
 
         if ($this->getRequest()->getParam('no-clobber') && is_file($datFilePath)) {
             $this->writeline('Database already exist. Skipping...', Color::RED);
             return;
         }
 
-        $gzFilePath = $destination . basename($source);
+        $gzFilePath = $this->config->getPackedDatabasePath();
+        $source     = $this->config->getSource();
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
 
@@ -92,7 +92,7 @@ class ConsoleController extends AbstractActionController
     private function writeLine($text, $color = null, $bgColor = null)
     {
         if ($this->isQuiet === null) {
-            $this->isQuiet = $this->getRequest()->getParam('q');
+            $this->isQuiet = $this->getRequest()->getParam('q', false);
         }
         if (!$this->isQuiet) {
             $this->console->writeLine($text, $color, $bgColor);

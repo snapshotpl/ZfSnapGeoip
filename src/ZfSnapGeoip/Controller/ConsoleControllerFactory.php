@@ -16,10 +16,9 @@ class ConsoleControllerFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $serviceLocator = $serviceLocator->getServiceLocator();
-        $console        = $serviceLocator->get('console');
-        $config         = $serviceLocator->get('config');
-        $databaseConfig = $config['maxmind']['database'];
+        $console        = $serviceLocator->get('Console');
+        $config         = $serviceLocator->get('ZfSnapGeoip\DatabaseConfig');
 
-        return new ConsoleController($console, $databaseConfig);
+        return new ConsoleController($console, $config);
     }
 }

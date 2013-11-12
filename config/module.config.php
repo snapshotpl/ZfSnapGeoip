@@ -1,48 +1,47 @@
 <?php
 
 return array(
-    'maxmind' => array(
+    'maxmind'         => array(
         'database' => array(
-            'source' => 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz',
+            'source'      => 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz',
             'destination' => __DIR__ . '/../data/',
-            'filename' => 'GeoLiteCity.dat',
-            'flag' => GEOIP_STANDARD,
-            'regionvars' => __DIR__ .'/../../../geoip/geoip/src/geoipregionvars.php',
+            'filename'    => 'GeoLiteCity.dat',
+            'flag'        => GEOIP_STANDARD,
+            'regionvars'  => __DIR__ . '/../../../geoip/geoip/src/geoipregionvars.php',
         ),
     ),
-
     'service_manager' => array(
         'invokables' => array(
-            'geoip' => 'ZfSnapGeoip\Service\Geoip',
-            'geoip_record' => 'ZfSnapGeoip\Entity\Record',
+            'geoip'          => 'ZfSnapGeoip\Service\Geoip',
+            'geoip_record'   => 'ZfSnapGeoip\Entity\Record',
             'geoip_hydrator' => 'Zend\Stdlib\Hydrator\ClassMethods',
         ),
-        'shared' => array(
+        'factories'  => array(
+            'ZfSnapGeoip\DatabaseConfig' => 'ZfSnapGeoip\DatabaseConfigFactory',
+        ),
+        'shared'     => array(
             'geoip_record' => false,
         ),
     ),
-
-    'view_helpers' => array(
+    'view_helpers'    => array(
         'invokables' => array(
             'geoip' => 'ZfSnapGeoip\View\Helper\Geoip',
         ),
     ),
-
-    'controllers' => array(
+    'controllers'     => array(
         'factories' => array(
             'ZfSnapGeoip\Controller\Console' => 'ZfSnapGeoip\Controller\ConsoleControllerFactory',
         ),
     ),
-
-    'console' => array(
+    'console'         => array(
         'router' => array(
             'routes' => array(
                 'geoip-download' => array(
                     'options' => array(
-                        'route' => ZfSnapGeoip\Module::CONSOLE_GEOIP_DOWNLOAD,
+                        'route'    => ZfSnapGeoip\Module::CONSOLE_GEOIP_DOWNLOAD,
                         'defaults' => array(
                             'controller' => 'ZfSnapGeoip\Controller\Console',
-                            'action' => 'download',
+                            'action'     => 'download',
                         )
                     )
                 )

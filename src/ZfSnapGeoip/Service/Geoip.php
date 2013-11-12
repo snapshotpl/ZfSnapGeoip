@@ -8,6 +8,7 @@
 
 namespace ZfSnapGeoip\Service;
 
+use ZfSnapGeoip\DatabaseConfig;
 use ZfSnapGeoip\Entity\RecordInterface;
 use ZfSnapGeoip\Exception\DomainException;
 use ZfSnapGeoip\IpAwareInterface;
@@ -38,7 +39,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     private $defaultIp;
 
     /**
-     * @var array
+     * @var DatabaseConfig
      */
     private $config;
 
@@ -61,10 +62,9 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     public function getGeoip()
     {
         if (!$this->geoip) {
-            $config   = $this->getConfig();
-            $database = $config['destination'] . $config['filename'];
+            $database = $this->getConfig()->getDatabasePath();
             if (file_exists($database)) {
-                $this->geoip = geoip_open($database, $config['flag']);
+                $this->geoip = geoip_open($database, $this->getConfig()->getFlag());
             } else {
                 throw new DomainException('You need to download Maxmind database. You can use ZFTool or composer.json for that :)');
             }
@@ -161,8 +161,7 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     private function getRegions()
     {
         if ($this->regions === null) {
-            $config        = $this->getConfig();
-            $regionVarPath = $config['regionvars'];
+            $regionVarPath = $this->getConfig()->getRegionVarsPath();
             include($regionVarPath);
 
             if (!isset($GEOIP_REGION_NAME)) {
@@ -175,13 +174,12 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     }
 
     /**
-     * @return array
+     * @return DatabaseConfig
      */
     private function getConfig()
     {
         if ($this->config === null) {
-            $config       = $this->serviceManager->get('Config');
-            $this->config = $config['maxmind']['database'];
+            $this->config = $this->serviceManager->get('ZfSnapGeoip\DatabaseConfig');
         }
         return $this->config;
     }
