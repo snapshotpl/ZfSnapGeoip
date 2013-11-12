@@ -3,7 +3,7 @@ ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?br
 
 Maxmind Geoip module for Zend Framework 2
 
-Version 2.0.2 Created by Witold Wasiczko
+Version 2.1.0 Created by Witold Wasiczko
 
 Usage
 -----
@@ -96,3 +96,13 @@ Or use autoupdate database during install/update in composer (just add this line
     }
 }
 ```
+
+Console usage
+-------------
+You can download GeoIP database from application console:
+```
+php index/public.php geoip download
+```
+There are optional parameters:
+* `--no-clobber` Don't overwrite an existing db file,
+* `-q` Turn off output,
