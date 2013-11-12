@@ -79,6 +79,8 @@ Via [`composer`](https://getcomposer.org/)
 }
 ```
 
+and add 'ZfSnapGeoip' module name to application config.
+
 To download data file from http://dev.maxmind.com/geoip/legacy/geolite/ use Zend\Console (you can add this to crontab):
 ```
 php index/public.php geoip download
