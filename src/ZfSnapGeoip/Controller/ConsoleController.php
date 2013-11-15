@@ -62,8 +62,12 @@ class ConsoleController extends AbstractActionController
     public function downloadAction()
     {
         $datFilePath = $this->config->getDatabasePath();
+        $events      = $this->getEventManager();
 
         if ($this->getRequest()->getParam('no-clobber') && is_file($datFilePath)) {
+            $events->trigger(__FUNCTION__ . '.exists', $this, array(
+                'path' => $datFilePath,
+            ));
             $this->writeline('Database already exist. Skipping...', Color::RED);
             return;
         }
@@ -80,7 +84,17 @@ class ConsoleController extends AbstractActionController
 
         $this->writeLine('Download completed', Color::GREEN);
         $this->writeLine('Unzip the downloading data...', Color::YELLOW);
+
+        $events->trigger(__FUNCTION__ . '.pre', $this, array(
+            'path' => $gzFilePath,
+        ));
+
         system(sprintf('gunzip -f %s', $gzFilePath));
+
+        $events->trigger(__FUNCTION__ . '.post', $this, array(
+            'path' => $datFilePath,
+        ));
+
         $this->writeLine(sprintf('Unzip completed (%s)', $datFilePath), Color::GREEN);
     }
 

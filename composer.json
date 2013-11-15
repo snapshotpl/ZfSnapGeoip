@@ -18,6 +18,7 @@
         "php": ">=5.3.3",
         "zendframework/zend-console": "2.2.*",
         "zendframework/zend-view": "2.2.*",
+        "zendframework/zend-eventmanager": "2.2.*",
         "zendframework/zend-modulemanager": "2.2.*",
         "zendframework/zend-servicemanager": "2.2.*",
         "geoip/geoip": "1.14"

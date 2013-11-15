@@ -12,11 +12,15 @@ use ZfSnapGeoip\DatabaseConfig;
 use ZfSnapGeoip\Entity\RecordInterface;
 use ZfSnapGeoip\Exception\DomainException;
 use ZfSnapGeoip\IpAwareInterface;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\EventManager;
 use Zend\Http\Request as HttpRequest;
 use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 use geoiprecord as GeoipCoreRecord;
 
-class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
+class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
 {
     /**
      * @var \GeoIP
@@ -27,6 +31,11 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
      * @var ServiceManager
      */
     private $serviceManager;
+
+    /**
+     * @var EventManagerInterface
+     */
+    private $eventManager;
 
     /**
      * @var GeoipCoreRecord[]
@@ -100,6 +109,9 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
         if ($ipAddress instanceof IpAwareInterface) {
             $ipAddress = $ipAddress->getIpAddress();
         }
+        $this->getEventManager()->trigger(__FUNCTION__, $this, array(
+            'ip' => $ipAddress,
+        ));
 
         return $ipAddress;
     }
@@ -130,6 +142,10 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
         /* @var $hydrator \Zend\Stdlib\Hydrator\HydratorInterface */
 
         $hydrator->hydrate($data, $record);
+
+        $this->getEventManager()->trigger(__FUNCTION__, $this, array(
+            'record' => $record,
+        ));
 
         return $record;
     }
@@ -169,6 +185,10 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
             }
 
             $this->regions = $GEOIP_REGION_NAME;
+
+            $this->getEventManager()->trigger(__FUNCTION__, $this, array(
+                'regions' => $this->regions,
+            ));
         }
         return $this->regions;
     }
@@ -231,5 +251,27 @@ class Geoip implements \Zend\ServiceManager\ServiceManagerAwareInterface
     public function setServiceManager(ServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
+    }
+
+    /**
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        if ($this->eventManager === null) {
+            $this->eventManager = new EventManager();
+        }
+        return $this->eventManager;
+    }
+
+    public function setEventManager(EventManagerInterface $eventManager)
+    {
+        $eventManager->setIdentifiers(array(
+            __CLASS__,
+            get_called_class(),
+        ));
+        $this->eventManager = $eventManager;
+
+        return $this;
     }
 }
