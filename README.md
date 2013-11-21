@@ -3,7 +3,7 @@ ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?br
 
 Maxmind Geoip module for Zend Framework 2
 
-Version 2.1.0 Created by Witold Wasiczko
+Version 2.2.0 Created by Witold Wasiczko
 
 Usage
 -----
@@ -68,13 +68,28 @@ setRegion($data)
 setRegionName($data)
 ```
 
+Events
+------
+
+Module supports Zend\EventManager.
+
+Class | Event name | Description | Params
+--- | --- | --- | ---
+ZfSnapGeoip\Controller\ConsoleController | downloadAction.exists | If no-clobber is enabled and file exists | path
+ZfSnapGeoip\Controller\ConsoleController | downloadAction.pre | Before unzip file | path (to gzip file)
+ZfSnapGeoip\Controller\ConsoleController | downloadAction.post | After unzip file | path (to dat file)
+ZfSnapGeoip\Service\Geoip | getIp | After read IP | ip (ip address)
+ZfSnapGeoip\Service\Geoip | getRecord | After created record | record (instance of ZfSnapGeoip\Entity\RecordInterface)
+ZfSnapGeoip\Service\Geoip | getRegions | After first loading regions names | regions
+
+
 How to install?
 ---------------
 Via [`composer`](https://getcomposer.org/)
 ```json
 {
     "require": {
-        "snapshotpl/zf-snap-geoip": "dev-master"
+        "snapshotpl/zf-snap-geoip": "2.*"
     }
 }
 ```
