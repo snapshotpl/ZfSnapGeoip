@@ -33,12 +33,12 @@ Returns country name for given IP:
 <?php echo $this->geoip('184.106.35.179')->getCountryName() ?>
 ```
 
-You can also implements \ZfSnapGeoip\IpAwareInterface interface and then use instance in service/helper:
+You can also implements `\ZfSnapGeoip\IpAwareInterface` interface and then use instance in service/helper:
 ```php
 <?php echo $this->geoip($user)->getRegionName() ?>
 ```
 
-Avaliable methods via \ZfSnapGeoip\Entity\Interface:
+Avaliable methods via `\ZfSnapGeoip\Entity\Interface`:
 ```
 getAreaCode()
 getCity()
@@ -71,7 +71,7 @@ setRegionName($data)
 Events
 ------
 
-Module supports Zend\EventManager.
+Module supports `\Zend\EventManager`.
 
 Class | Event name | Description | Params
 --- | --- | --- | ---
@@ -85,7 +85,7 @@ ZfSnapGeoip\Service\Geoip | getRegions | After first loading regions names | reg
 
 How to install?
 ---------------
-Via [`composer`](https://getcomposer.org/)
+Via [composer.json](https://getcomposer.org/)
 ```json
 {
     "require": {
@@ -94,9 +94,9 @@ Via [`composer`](https://getcomposer.org/)
 }
 ```
 
-and add 'ZfSnapGeoip' module name to application config.
+and add `ZfSnapGeoip` module name to application.config.php
 
-To download data file from http://dev.maxmind.com/geoip/legacy/geolite/ use Zend\Console (you can add this to crontab):
+To download data file from http://dev.maxmind.com/geoip/legacy/geolite/ use `Zend\Console` (you can add this to crontab):
 ```
 php index/public.php geoip download
 ```
