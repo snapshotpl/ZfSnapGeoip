@@ -118,7 +118,7 @@ Console usage
 -------------
 You can download GeoIP database from application console:
 ```
-php index/public.php geoip download
+php public/index.php geoip download
 ```
 There are optional parameters:
 * `--no-clobber` Don't overwrite an existing db file,
