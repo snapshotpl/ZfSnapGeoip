@@ -58,4 +58,6 @@ interface RecordInterface
     public function setRegion($data);
 
     public function setRegionName($data);
+
+    public function getTimezone();
 }
