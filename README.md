@@ -35,10 +35,10 @@ Returns country name for given IP:
 
 You can also implements `\ZfSnapGeoip\IpAwareInterface` interface and then use instance in service/helper:
 ```php
-<?php echo $this->geoip($user)->getRegionName() ?>
+<?php echo $this->geoip($user)->getTimezone() ?>
 ```
 
-Avaliable methods via `\ZfSnapGeoip\Entity\Interface`:
+Avaliable getter methods via `\ZfSnapGeoip\Entity\Record`:
 ```
 getAreaCode()
 getCity()
@@ -53,19 +53,7 @@ getMetroCode()
 getPostalCode()
 getRegion()
 getRegionName()
-setAreaCode($data)
-setCity($data)
-setContinentCode($data)
-setCountryCode($data)
-setCountryCode3($data)
-setCountryName($data)
-setDmaCode($data)
-setLatitude($data)
-setLongitude($data)
-setMetroCode($data)
-setPostalCode($data)
-setRegion($data)
-setRegionName($data)
+getTimezone()
 ```
 
 Events

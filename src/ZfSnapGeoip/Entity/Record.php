@@ -2,8 +2,6 @@
 
 namespace ZfSnapGeoip\Entity;
 
-use DateTimeZone;
-
 /**
  * Record entity
  *
@@ -171,8 +169,9 @@ class Record implements RecordInterface
     public function getTimezone()
     {
         $country = $this->getCountryCode();
+        $region = $this->getRegion();
 
-        return DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $country);
+        return \get_time_zone($country, $region);
     }
 
     public function __toString()

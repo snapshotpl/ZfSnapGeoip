@@ -8,10 +8,14 @@
 
 namespace ZfSnapGeoip;
 
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
 use Zend\Console\Adapter\AdapterInterface;
+use Zend\EventManager\EventInterface;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface as ConsoleUsage;
+use Zend\ModuleManager\Feature\ConfigProviderInterface as Config;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface as Autoloader;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface as BootstrapListener;
 
-class Module implements ConsoleUsageProviderInterface
+class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
 {
     const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--no-clobber] [-q]';
 
@@ -46,4 +50,16 @@ class Module implements ConsoleUsageProviderInterface
             array('-q', 'Turn off output'),
         );
     }
+
+    /**
+     * @param \Zend\EventManager\EventInterface $e
+     */
+    public function onBootstrap(EventInterface $e)
+    {
+        $serviceManager = $e->getParam('application')->getServiceManager();
+        $config = $serviceManager->get('config');
+
+        require_once $config['maxmind']['timezone_function_path'];
+    }
+
 }
