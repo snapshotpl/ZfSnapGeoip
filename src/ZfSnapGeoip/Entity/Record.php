@@ -166,6 +166,14 @@ class Record implements RecordInterface
         return $this;
     }
 
+    public function getTimezone()
+    {
+        $country = $this->getCountryCode();
+        $region = $this->getRegion();
+
+        return \get_time_zone($country, $region);
+    }
+
     public function __toString()
     {
         $city = $this->getCity();

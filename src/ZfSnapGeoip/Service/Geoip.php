@@ -226,7 +226,7 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
     }
 
     /**
-     * @param string $ip
+     * @param array $data
      * @return string
      */
     private function getRegionName(array $data = array())
