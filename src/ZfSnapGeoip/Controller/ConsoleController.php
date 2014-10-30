@@ -84,7 +84,7 @@ class ConsoleController extends AbstractActionController
         $client = new Client();
         $client->setUri($source);
         $client->setAdapter($adapter);
-        $client->setMethod(strtoupper('GET'));
+        $client->setMethod(Request::METHOD_GET);
         $response = $client->send();
 
         if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
