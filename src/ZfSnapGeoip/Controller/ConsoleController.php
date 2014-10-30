@@ -8,6 +8,9 @@
 
 namespace ZfSnapGeoip\Controller;
 
+use Zend\Filter\File\Rename;
+use Zend\Http\Client;
+use Zend\Http\Response;
 use ZfSnapGeoip\DatabaseConfig;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\ColorInterface as Color;
@@ -72,24 +75,31 @@ class ConsoleController extends AbstractActionController
             return;
         }
 
-        $gzFilePath = $this->config->getPackedDatabasePath();
         $source     = $this->config->getSource();
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
 
-        if (!copy($source, $gzFilePath)) {
+        $adapter = new Client\Adapter\Socket();
+
+        $client = new Client();
+        $client->setUri($source);
+        $client->setAdapter($adapter);
+        $client->setMethod(strtoupper('GET'));
+        $response = $client->send();
+
+        if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::RED);
             return;
+        } else {
+            $events->trigger(__FUNCTION__ . '.pre', $this, array(
+                'path' => $datFilePath,
+            ));
+            file_put_contents($datFilePath, gzdecode($response->getBody()));
         }
 
         $this->writeLine('Download completed', Color::GREEN);
         $this->writeLine('Unzip the downloading data...', Color::YELLOW);
 
-        $events->trigger(__FUNCTION__ . '.pre', $this, array(
-            'path' => $gzFilePath,
-        ));
-
-        system(sprintf('gunzip -f %s', $gzFilePath));
 
         $events->trigger(__FUNCTION__ . '.post', $this, array(
             'path' => $datFilePath,
@@ -113,3 +123,4 @@ class ConsoleController extends AbstractActionController
         }
     }
 }
+
