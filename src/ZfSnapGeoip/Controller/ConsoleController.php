@@ -8,7 +8,6 @@
 
 namespace ZfSnapGeoip\Controller;
 
-use Zend\Filter\File\Rename;
 use Zend\Http\Client;
 use Zend\Http\Response;
 use ZfSnapGeoip\DatabaseConfig;
@@ -39,6 +38,11 @@ class ConsoleController extends AbstractActionController
     protected $config;
 
     /**
+     * @var Zend\Http\Client
+     */
+    protected  $httpClient;
+
+    /**
      * @param Console $console
      * @param DatabaseConfig $config
      */
@@ -46,6 +50,14 @@ class ConsoleController extends AbstractActionController
     {
         $this->console = $console;
         $this->config  = $config;
+    }
+
+    /**
+     * @param \Zend\Http\Client $httpClient
+     */
+    public function setHttpClient(Client $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -81,25 +93,22 @@ class ConsoleController extends AbstractActionController
 
         $adapter = new Client\Adapter\Socket();
 
-        $client = new Client();
-        $client->setUri($source);
-        $client->setAdapter($adapter);
-        $client->setMethod(Request::METHOD_GET);
-        $response = $client->send();
+        $this->httpClient->setUri($source);
+        $this->httpClient->setMethod(Request::METHOD_GET);
+        $response = $this->httpClient->send();
 
         if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::RED);
             return;
-        } else {
-            $events->trigger(__FUNCTION__ . '.pre', $this, array(
-                'path' => $datFilePath,
-            ));
-            file_put_contents($datFilePath, gzdecode($response->getBody()));
         }
+
+        $events->trigger(__FUNCTION__ . '.pre', $this, array(
+            'path' => $datFilePath,
+        ));
 
         $this->writeLine('Download completed', Color::GREEN);
         $this->writeLine('Unzip the downloading data...', Color::YELLOW);
-
+        file_put_contents($datFilePath, gzdecode($response->getBody()));
 
         $events->trigger(__FUNCTION__ . '.post', $this, array(
             'path' => $datFilePath,
