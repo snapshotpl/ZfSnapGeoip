@@ -9,6 +9,7 @@
 namespace ZfSnapGeoip\Controller;
 
 use Zend\Http\Client;
+use Zend\Http\Request;
 use Zend\Http\Response;
 use ZfSnapGeoip\DatabaseConfig;
 use Zend\Console\Adapter\AdapterInterface as Console;
