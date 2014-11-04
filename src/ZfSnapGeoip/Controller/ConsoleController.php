@@ -46,10 +46,11 @@ class ConsoleController extends AbstractActionController
      * @param Console $console
      * @param DatabaseConfig $config
      */
-    public function __construct(Console $console, DatabaseConfig $config)
+    public function __construct(Console $console, DatabaseConfig $config, Client $httpClient)
     {
         $this->console = $console;
         $this->config  = $config;
+        $this->httpClient = $httpClient;
     }
 
     /**
