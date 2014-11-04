@@ -19,6 +19,7 @@ return array(
         ),
         'factories'  => array(
             'ZfSnapGeoip\DatabaseConfig' => 'ZfSnapGeoip\DatabaseConfigFactory',
+            'ZfSnapGeoip\HttpClient' => 'ZfSnapGeoip\HttpClientFactory',
         ),
         'shared'     => array(
             'geoip_record' => false,

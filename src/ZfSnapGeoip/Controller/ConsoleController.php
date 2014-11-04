@@ -90,9 +90,7 @@ class ConsoleController extends AbstractActionController
         $source     = $this->config->getSource();
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
-
-        $adapter = new Client\Adapter\Socket();
-
+        
         $this->httpClient->setUri($source);
         $this->httpClient->setMethod(Request::METHOD_GET);
         $response = $this->httpClient->send();
