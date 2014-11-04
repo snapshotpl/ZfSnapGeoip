@@ -51,7 +51,7 @@ class ConsoleController extends AbstractActionController
     {
         $this->console = $console;
         $this->config  = $config;
-        $this->httpClient = $httpClient;
+        $this->setHttpClient($httpClient);
     }
 
     /**
