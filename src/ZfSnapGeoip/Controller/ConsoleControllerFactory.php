@@ -15,6 +15,7 @@ class ConsoleControllerFactory implements FactoryInterface
 
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /* @var $serviceLocator \Zend\Mvc\Controller\ControllerManager */
         $sm = $serviceLocator->getServiceLocator();
 
         $console = $sm->get('Console');

@@ -11,6 +11,7 @@ class HttpClientFactory implements FactoryInterface
 
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /* @var $adapter Zend\Http\Client\Adapter\AdapterInterface */
         $adapter = $serviceLocator->get('ZfSnapGeoip\HttpClient\Adapter');
 
         $client = new Client();

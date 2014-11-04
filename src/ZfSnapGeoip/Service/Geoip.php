@@ -9,7 +9,7 @@ use ZfSnapGeoip\IpAwareInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventManager;
-use Zend\Http\Request as HttpRequest;
+use Zend\Http\PhpEnvironment\Request as HttpRequest;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use geoiprecord as GeoipCoreRecord;
@@ -42,7 +42,7 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
     private $records;
 
     /**
-     * @var string
+     * @var string|bool
      */
     private $defaultIp;
 
@@ -198,14 +198,15 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
     private function getConfig()
     {
         if ($this->config === null) {
-            $this->config = $this->serviceManager->get('ZfSnapGeoip\DatabaseConfig');
+            /* @var $config DatabaseConfig */
+            $config = $this->serviceManager->get('ZfSnapGeoip\DatabaseConfig');
+            $this->config = $config;
         }
         return $this->config;
     }
 
     /**
-     *
-     * @return $string|null
+     * @return string|null
      */
     private function getDefaultIp()
     {
@@ -213,14 +214,13 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
             $request = $this->serviceManager->get('Request');
 
             if ($request instanceof HttpRequest) {
-                $ipAddress = $request->getServer('REMOTE_ADDR');
+                $ipAddress = $request->getServer('REMOTE_ADDR', false);
                 $this->defaultIp = $ipAddress;
             } else {
                 $this->defaultIp = false;
                 return null;
             }
         }
-
         return $this->defaultIp;
     }
 
@@ -263,6 +263,10 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
         return $this->eventManager;
     }
 
+    /**
+     * @param EventManagerInterface $eventManager
+     * @return self
+     */
     public function setEventManager(EventManagerInterface $eventManager)
     {
         $eventManager->setIdentifiers(array(
