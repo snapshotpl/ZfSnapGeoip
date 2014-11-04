@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Console Controller
- *
- * @author Witold Wasiczko <witold@wasiczko.pl>
- */
-
 namespace ZfSnapGeoip\Controller;
 
 use Zend\Http\Client;
@@ -19,6 +13,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Console Controller
+ *
+ * @author Witold Wasiczko <witold@wasiczko.pl>
+ */
 class ConsoleController extends AbstractActionController
 {
     /**
@@ -39,23 +38,24 @@ class ConsoleController extends AbstractActionController
     protected $config;
 
     /**
-     * @var Zend\Http\Client
+     * @var Client
      */
-    protected  $httpClient;
+    protected $httpClient;
 
     /**
      * @param Console $console
      * @param DatabaseConfig $config
+     * @param Client $httpClient
      */
     public function __construct(Console $console, DatabaseConfig $config, Client $httpClient)
     {
         $this->console = $console;
-        $this->config  = $config;
+        $this->config = $config;
         $this->setHttpClient($httpClient);
     }
 
     /**
-     * @param \Zend\Http\Client $httpClient
+     * @param Client $httpClient
      */
     public function setHttpClient(Client $httpClient)
     {
@@ -79,42 +79,52 @@ class ConsoleController extends AbstractActionController
     public function downloadAction()
     {
         $datFilePath = $this->config->getDatabasePath();
-        $events      = $this->getEventManager();
+        $events = $this->getEventManager();
 
         if ($this->getRequest()->getParam('no-clobber') && is_file($datFilePath)) {
             $events->trigger(__FUNCTION__ . '.exists', $this, array(
                 'path' => $datFilePath,
             ));
-            $this->writeline('Database already exist. Skipping...', Color::RED);
+            $this->writeline('Database already exist. Skipping...', Color::LIGHT_RED);
             return;
         }
-
-        $source     = $this->config->getSource();
-
-        $this->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
-        
-        $this->httpClient->setUri($source);
-        $this->httpClient->setMethod(Request::METHOD_GET);
-        $response = $this->httpClient->send();
+        $response = $this->getDbResponse();
 
         if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
-            $this->writeLine('Error during file download occured', Color::RED);
+            $this->writeLine('Error during file download occured', Color::LIGHT_RED);
             return;
         }
 
         $events->trigger(__FUNCTION__ . '.pre', $this, array(
             'path' => $datFilePath,
+            'response' => $response,
         ));
 
-        $this->writeLine('Download completed', Color::GREEN);
-        $this->writeLine('Unzip the downloading data...', Color::YELLOW);
+        $this->writeLine('Download completed', Color::LIGHT_GREEN);
+        $this->writeLine('Unzip the downloading data...', Color::LIGHT_YELLOW);
+
         file_put_contents($datFilePath, gzdecode($response->getBody()));
 
         $events->trigger(__FUNCTION__ . '.post', $this, array(
             'path' => $datFilePath,
         ));
 
-        $this->writeLine(sprintf('Unzip completed (%s)', $datFilePath), Color::GREEN);
+        $this->writeLine(sprintf('Unzip completed (%s)', $datFilePath), Color::LIGHT_GREEN);
+    }
+
+    /**
+     * @return Response
+     */
+    public function getDbResponse()
+    {
+        $source = $this->config->getSource();
+
+        $this->writeLine(sprintf('Downloading %s...', $source), Color::LIGHT_YELLOW);
+
+        $this->httpClient->setUri($source);
+        $this->httpClient->setMethod(Request::METHOD_GET);
+
+        return $this->httpClient->send();
     }
 
     /**
@@ -122,14 +132,30 @@ class ConsoleController extends AbstractActionController
      * @param int $color
      * @param int $bgColor
      */
-    private function writeLine($text, $color = null, $bgColor = null)
+    public function writeLine($text, $color = null, $bgColor = null)
     {
-        if ($this->isQuiet === null) {
-            $this->isQuiet = $this->getRequest()->getParam('q', false);
-        }
-        if (!$this->isQuiet) {
-            $this->console->writeLine($text, $color, $bgColor);
+        if (!$this->isQuietMode()) {
+            $this->getConsole()->writeLine($text, $color, $bgColor);
         }
     }
-}
 
+    /**
+     * @return Console
+     */
+    public function getConsole()
+    {
+        return $this->console;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuietMode()
+    {
+        if ($this->isQuiet === null) {
+            $this->isQuiet = (bool) $this->getRequest()->getParam('q', false);
+        }
+        return $this->isQuiet;
+    }
+
+}

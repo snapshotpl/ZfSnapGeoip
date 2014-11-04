@@ -1,15 +1,15 @@
 <?php
 
+namespace ZfSnapGeoip;
+
 /**
  * IPable iterface
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
-
-namespace ZfSnapGeoip;
-
 interface IpAwareInterface
 {
+
     /**
      * @return string IP address
      */

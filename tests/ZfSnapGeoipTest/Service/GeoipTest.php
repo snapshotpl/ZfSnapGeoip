@@ -11,7 +11,6 @@ use \ZfSnapGeoipTest\Bootstrap;
  */
 class GeoipTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var \Zend\ServiceManager\ServiceManager
      */
@@ -66,7 +65,7 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
         $record = $this->getRecordWithTrueIp();
 
         $this->assertEquals('Mountain View', $record->getCity());
-        $this->assertEquals('Mountain View', (string)$record);
+        $this->assertEquals('Mountain View', (string) $record);
     }
 
     public function testCity()
@@ -129,9 +128,10 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
         $ipIterface = $this->getMockBuilder('\ZfSnapGeoip\IpAwareInterface')->getMock();
 
         $ipIterface->expects($this->any())
-                   ->method('getIpAddress')
-                   ->will($this->returnValue($ip));
+                ->method('getIpAddress')
+                ->will($this->returnValue($ip));
 
         return $ipIterface;
     }
+
 }

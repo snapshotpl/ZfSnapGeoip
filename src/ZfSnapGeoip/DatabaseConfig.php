@@ -1,13 +1,12 @@
 <?php
 
+namespace ZfSnapGeoip;
+
 /**
  * Config
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
-
-namespace ZfSnapGeoip;
-
 class DatabaseConfig
 {
     protected $data;
@@ -51,4 +50,5 @@ class DatabaseConfig
     {
         return $this->getDestination() . $this->getFilename();
     }
+
 }

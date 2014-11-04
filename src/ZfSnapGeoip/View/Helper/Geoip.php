@@ -1,21 +1,20 @@
 <?php
 
-/**
- * Geoip view helper
- *
- * @author Witold Wasiczko <witold@wasiczko.pl>
- */
-
 namespace ZfSnapGeoip\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+/**
+ * Geoip view helper
+ *
+ * @author Witold Wasiczko <witold@wasiczko.pl>
+ */
 class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
 {
     /**
-     * @var ZfSnapGeoip\Service\Geoip
+     * @var \ZfSnapGeoip\Service\Geoip
      */
     private $geoip;
 
@@ -39,7 +38,7 @@ class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
      */
     public function __toString()
     {
-        return (string)$this->getGeoip()->getRecord();
+        return (string) $this->getGeoip()->getRecord();
     }
 
     private function getGeoip()
@@ -59,4 +58,5 @@ class Geoip extends AbstractHelper implements ServiceLocatorAwareInterface
     {
         $this->serviceLocator = $serviceLocator;
     }
+
 }

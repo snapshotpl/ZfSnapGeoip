@@ -3,7 +3,7 @@ ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?br
 
 Maxmind Geoip module for Zend Framework 2
 
-Version 2.3.0 Created by Witold Wasiczko
+Version 2.4.0 Created by Witold Wasiczko
 
 Usage
 -----
@@ -63,8 +63,8 @@ Module supports `\Zend\EventManager`.
 
 Class | Event name | Description | Params
 --- | --- | --- | ---
-ZfSnapGeoip\Controller\ConsoleController | downloadAction.exists | If no-clobber is enabled and file exists | path
-ZfSnapGeoip\Controller\ConsoleController | downloadAction.pre | Before unzip file | path (to gzip file)
+ZfSnapGeoip\Controller\ConsoleController | downloadAction.exists | If no-clobber is enabled and file exists | path (to dat file)
+ZfSnapGeoip\Controller\ConsoleController | downloadAction.pre | Before unzip file | path (to dat file), response (gziped response object)
 ZfSnapGeoip\Controller\ConsoleController | downloadAction.post | After unzip file | path (to dat file)
 ZfSnapGeoip\Service\Geoip | getIp | After read IP | ip (ip address)
 ZfSnapGeoip\Service\Geoip | getRecord | After created record | record (instance of ZfSnapGeoip\Entity\RecordInterface)

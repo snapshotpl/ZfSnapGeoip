@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Geoip Service
- *
- * @author Witold Wasiczko <witold@wasiczko.pl>
- */
-
 namespace ZfSnapGeoip\Service;
 
 use ZfSnapGeoip\DatabaseConfig;
@@ -20,6 +14,11 @@ use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use geoiprecord as GeoipCoreRecord;
 
+/**
+ * Geoip Service
+ *
+ * @author Witold Wasiczko <witold@wasiczko.pl>
+ */
 class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
 {
     /**
@@ -135,7 +134,7 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
             return $record;
         }
 
-        $data                = get_object_vars($geoipRecord);
+        $data = get_object_vars($geoipRecord);
         $data['region_name'] = $this->getRegionName($data);
 
         $hydrator = $this->serviceManager->get('geoip_hydrator');
@@ -214,7 +213,7 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
             $request = $this->serviceManager->get('Request');
 
             if ($request instanceof HttpRequest) {
-                $ipAddress       = $request->getServer('REMOTE_ADDR');
+                $ipAddress = $request->getServer('REMOTE_ADDR');
                 $this->defaultIp = $ipAddress;
             } else {
                 $this->defaultIp = false;
@@ -231,12 +230,12 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
      */
     private function getRegionName(array $data = array())
     {
-        $regions     = $this->getRegions();
+        $regions = $this->getRegions();
         $countryCode = isset($data['country_code']) ? $data['country_code'] : null;
 
         if (isset($regions[$countryCode])) {
             $regionCodes = $regions[$countryCode];
-            $regionCode  = isset($data['region']) ? $data['region'] : null;
+            $regionCode = isset($data['region']) ? $data['region'] : null;
 
             if (isset($regionCodes[$regionCode])) {
                 return $regionCodes[$regionCode];
@@ -274,4 +273,5 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
 
         return $this;
     }
+
 }
