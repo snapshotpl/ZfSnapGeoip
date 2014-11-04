@@ -51,9 +51,4 @@ class DatabaseConfig
     {
         return $this->getDestination() . $this->getFilename();
     }
-
-    public function getPackedDatabasePath()
-    {
-        return $this->getDestination() . $this->getSourceBasename();
-    }
 }

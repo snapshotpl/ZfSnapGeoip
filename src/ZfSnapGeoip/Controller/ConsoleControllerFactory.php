@@ -18,7 +18,8 @@ class ConsoleControllerFactory implements FactoryInterface
         $serviceLocator = $serviceLocator->getServiceLocator();
         $console        = $serviceLocator->get('Console');
         $config         = $serviceLocator->get('ZfSnapGeoip\DatabaseConfig');
+        $httpClient     = $serviceLocator->get('ZfSnapGeoip\HttpClient');
 
-        return new ConsoleController($console, $config);
+        return new ConsoleController($console, $config, $httpClient);
     }
 }

@@ -16,9 +16,11 @@ return array(
             'geoip'          => 'ZfSnapGeoip\Service\Geoip',
             'geoip_record'   => 'ZfSnapGeoip\Entity\Record',
             'geoip_hydrator' => 'Zend\Stdlib\Hydrator\ClassMethods',
+            'ZfSnapGeoip\HttpClient\Adapter' => 'Zend\Http\Client\Adapter\Curl',
         ),
         'factories'  => array(
             'ZfSnapGeoip\DatabaseConfig' => 'ZfSnapGeoip\DatabaseConfigFactory',
+            'ZfSnapGeoip\HttpClient' => 'ZfSnapGeoip\HttpClientFactory',
         ),
         'shared'     => array(
             'geoip_record' => false,

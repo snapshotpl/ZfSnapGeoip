@@ -8,6 +8,9 @@
 
 namespace ZfSnapGeoip\Controller;
 
+use Zend\Http\Client;
+use Zend\Http\Request;
+use Zend\Http\Response;
 use ZfSnapGeoip\DatabaseConfig;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\ColorInterface as Color;
@@ -36,13 +39,27 @@ class ConsoleController extends AbstractActionController
     protected $config;
 
     /**
+     * @var Zend\Http\Client
+     */
+    protected  $httpClient;
+
+    /**
      * @param Console $console
      * @param DatabaseConfig $config
      */
-    public function __construct(Console $console, DatabaseConfig $config)
+    public function __construct(Console $console, DatabaseConfig $config, Client $httpClient)
     {
         $this->console = $console;
         $this->config  = $config;
+        $this->setHttpClient($httpClient);
+    }
+
+    /**
+     * @param \Zend\Http\Client $httpClient
+     */
+    public function setHttpClient(Client $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -72,24 +89,26 @@ class ConsoleController extends AbstractActionController
             return;
         }
 
-        $gzFilePath = $this->config->getPackedDatabasePath();
         $source     = $this->config->getSource();
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::YELLOW);
+        
+        $this->httpClient->setUri($source);
+        $this->httpClient->setMethod(Request::METHOD_GET);
+        $response = $this->httpClient->send();
 
-        if (!copy($source, $gzFilePath)) {
+        if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::RED);
             return;
         }
 
-        $this->writeLine('Download completed', Color::GREEN);
-        $this->writeLine('Unzip the downloading data...', Color::YELLOW);
-
         $events->trigger(__FUNCTION__ . '.pre', $this, array(
-            'path' => $gzFilePath,
+            'path' => $datFilePath,
         ));
 
-        system(sprintf('gunzip -f %s', $gzFilePath));
+        $this->writeLine('Download completed', Color::GREEN);
+        $this->writeLine('Unzip the downloading data...', Color::YELLOW);
+        file_put_contents($datFilePath, gzdecode($response->getBody()));
 
         $events->trigger(__FUNCTION__ . '.post', $this, array(
             'path' => $datFilePath,
@@ -113,3 +132,4 @@ class ConsoleController extends AbstractActionController
         }
     }
 }
+
