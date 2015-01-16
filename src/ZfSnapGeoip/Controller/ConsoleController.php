@@ -90,7 +90,7 @@ class ConsoleController extends AbstractActionController
         }
         $response = $this->getDbResponse();
 
-        if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
+        if (! $response instanceof Response || $response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::LIGHT_RED);
             return;
         }
@@ -121,10 +121,17 @@ class ConsoleController extends AbstractActionController
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::LIGHT_YELLOW);
 
-        $this->httpClient->setUri($source);
-        $this->httpClient->setMethod(Request::METHOD_GET);
+        try {
+            $this->httpClient->setUri($source);
+            $this->httpClient->setMethod(Request::METHOD_GET);
+            $this->httpClient->setOptions(array('timeout' => 30));
+            
+            return $this->httpClient->send();
+        } catch (\Exception $e) {
+            $this->writeLine(sprintf('%s', $e->getMessage()), Color::WHITE, Color::RED);
 
-        return $this->httpClient->send();
+            return null;
+        }
     }
 
     /**
