@@ -88,7 +88,13 @@ class ConsoleController extends AbstractActionController
             $this->writeline('Database already exist. Skipping...', Color::LIGHT_RED);
             return;
         }
-        $response = $this->getDbResponse();
+
+        try {
+            $response = $this->getDbResponse();
+        } catch (\Zend\Http\Client\Exception\RuntimeException $e) {
+            $this->writeLine(sprintf('%s', $e->getMessage()), Color::WHITE, Color::RED);
+            return;
+        }
 
         if (! $response instanceof Response || $response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::LIGHT_RED);
@@ -121,17 +127,10 @@ class ConsoleController extends AbstractActionController
 
         $this->writeLine(sprintf('Downloading %s...', $source), Color::LIGHT_YELLOW);
 
-        try {
-            $this->httpClient->setUri($source);
-            $this->httpClient->setMethod(Request::METHOD_GET);
-            $this->httpClient->setOptions(array('timeout' => 30));
-            
-            return $this->httpClient->send();
-        } catch (\Exception $e) {
-            $this->writeLine(sprintf('%s', $e->getMessage()), Color::WHITE, Color::RED);
+        $this->httpClient->setUri($source);
+        $this->httpClient->setMethod(Request::METHOD_GET);
 
-            return null;
-        }
+        return $this->httpClient->send();
     }
 
     /**
