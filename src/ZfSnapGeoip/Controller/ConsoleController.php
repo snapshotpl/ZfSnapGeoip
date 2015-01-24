@@ -86,7 +86,7 @@ class ConsoleController extends AbstractActionController
             $events->trigger(__FUNCTION__ . '.exists', $this, array(
                 'path' => $datFilePath,
             ));
-            $this->writeLineError('Database already exist. Skipping...');
+            $this->writeLine('Database already exist. Skipping...');
             return;
         }
 
