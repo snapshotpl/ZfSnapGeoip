@@ -18,8 +18,8 @@ class HttpClientFactory implements FactoryInterface
         $options = $config['maxmind']['http_client']['options'];
 
         $client = new Client();
-        $client->setAdapter($adapter)
-               ->setOptions($options);
+        $client->setAdapter($adapter);
+        $client->setOptions($options);
 
         return $client;
     }

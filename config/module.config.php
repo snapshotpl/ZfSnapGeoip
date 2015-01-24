@@ -11,8 +11,8 @@ return array(
         ),
         'http_client' => array(
             'options' => array(
-                'timeout' => 300
-            )
+                'timeout' => 300,
+            ),
         ),
         'timezone_function_path' => __DIR__ . '/../../../geoip/geoip/src/timezone.php',
     ),
@@ -50,10 +50,10 @@ return array(
                         'defaults' => array(
                             'controller' => 'ZfSnapGeoip\Controller\Console',
                             'action' => 'download',
-                        )
-                    )
-                )
-            )
-        )
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ),
 );

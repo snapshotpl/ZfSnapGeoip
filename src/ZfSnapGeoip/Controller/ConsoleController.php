@@ -2,16 +2,17 @@
 
 namespace ZfSnapGeoip\Controller;
 
-use Zend\Http\Client;
-use Zend\Http\Request;
-use Zend\Http\Response;
-use ZfSnapGeoip\DatabaseConfig;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\ColorInterface as Color;
 use Zend\Console\Request as ConsoleRequest;
+use Zend\Http\Client;
+use Zend\Http\Client\Exception\RuntimeException;
+use Zend\Http\Request;
+use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
+use ZfSnapGeoip\DatabaseConfig;
 
 /**
  * Console Controller
@@ -85,19 +86,19 @@ class ConsoleController extends AbstractActionController
             $events->trigger(__FUNCTION__ . '.exists', $this, array(
                 'path' => $datFilePath,
             ));
-            $this->writeline('Database already exist. Skipping...', Color::LIGHT_RED);
+            $this->writeLineError('Database already exist. Skipping...');
             return;
         }
 
         try {
             $response = $this->getDbResponse();
-        } catch (\Zend\Http\Client\Exception\RuntimeException $e) {
-            $this->writeLine(sprintf('%s', $e->getMessage()), Color::WHITE, Color::RED);
+        } catch (RuntimeException $e) {
+            $this->writeLineError(sprintf('%s', $e->getMessage()));
             return;
         }
 
-        if (! $response instanceof Response || $response->getStatusCode() !== Response::STATUS_CODE_200) {
-            $this->writeLine('Error during file download occured', Color::LIGHT_RED);
+        if (!$response instanceof Response || $response->getStatusCode() !== Response::STATUS_CODE_200) {
+            $this->writeLineError('Error during file download occured');
             return;
         }
 
@@ -106,8 +107,8 @@ class ConsoleController extends AbstractActionController
             'response' => $response,
         ));
 
-        $this->writeLine('Download completed', Color::LIGHT_GREEN);
-        $this->writeLine('Unzip the downloading data...', Color::LIGHT_YELLOW);
+        $this->writeLineSuccess('Download completed');
+        $this->writeLine('Unzip the downloading data...');
 
         file_put_contents($datFilePath, gzdecode($response->getBody()));
 
@@ -115,7 +116,7 @@ class ConsoleController extends AbstractActionController
             'path' => $datFilePath,
         ));
 
-        $this->writeLine(sprintf('Unzip completed (%s)', $datFilePath), Color::LIGHT_GREEN);
+        $this->writeLineSuccess(sprintf('Unzip completed (%s)', $datFilePath));
     }
 
     /**
@@ -125,7 +126,7 @@ class ConsoleController extends AbstractActionController
     {
         $source = $this->config->getSource();
 
-        $this->writeLine(sprintf('Downloading %s...', $source), Color::LIGHT_YELLOW);
+        $this->writeLine(sprintf('Downloading %s...', $source));
 
         $this->httpClient->setUri($source);
         $this->httpClient->setMethod(Request::METHOD_GET);
@@ -143,6 +144,22 @@ class ConsoleController extends AbstractActionController
         if (!$this->isQuietMode()) {
             $this->getConsole()->writeLine($text, $color, $bgColor);
         }
+    }
+
+    /**
+     * @param string $text
+     */
+    public function writeLineError($text)
+    {
+        $this->writeLine($text, Color::WHITE, Color::RED);
+    }
+
+    /**
+     * @param string $text
+     */
+    public function writeLineSuccess($text)
+    {
+        $this->writeLine($text, Color::LIGHT_GREEN);
     }
 
     /**
