@@ -9,6 +9,11 @@ return array(
             'flag' => GEOIP_STANDARD,
             'regionvars' => __DIR__ . '/../../../geoip/geoip/src/geoipregionvars.php',
         ),
+        'http_client' => array(
+            'options' => array(
+                'timeout' => 300
+            )
+        ),
         'timezone_function_path' => __DIR__ . '/../../../geoip/geoip/src/timezone.php',
     ),
     'service_manager' => array(

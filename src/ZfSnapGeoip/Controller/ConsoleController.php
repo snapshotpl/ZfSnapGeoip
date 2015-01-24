@@ -88,9 +88,15 @@ class ConsoleController extends AbstractActionController
             $this->writeline('Database already exist. Skipping...', Color::LIGHT_RED);
             return;
         }
-        $response = $this->getDbResponse();
 
-        if ($response->getStatusCode() !== Response::STATUS_CODE_200) {
+        try {
+            $response = $this->getDbResponse();
+        } catch (\Zend\Http\Client\Exception\RuntimeException $e) {
+            $this->writeLine(sprintf('%s', $e->getMessage()), Color::WHITE, Color::RED);
+            return;
+        }
+
+        if (! $response instanceof Response || $response->getStatusCode() !== Response::STATUS_CODE_200) {
             $this->writeLine('Error during file download occured', Color::LIGHT_RED);
             return;
         }
