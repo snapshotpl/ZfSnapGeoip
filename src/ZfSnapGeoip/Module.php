@@ -8,7 +8,6 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface as Autoloader;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface as BootstrapListener;
 use Zend\ModuleManager\Feature\ConfigProviderInterface as Config;
 use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface as ConsoleUsage;
-use Zend\Mvc\MvcEvent;
 
 /**
  * Geoip module
@@ -58,9 +57,9 @@ class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
     }
 
     /**
-     * @param EventInterface $event
+     * @param \Zend\Mvc\MvcEvent $event
      */
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(EventInterface $event)
     {
         $serviceManager = $event->getApplication()->getServiceManager();
         $config = $serviceManager->get('config');
