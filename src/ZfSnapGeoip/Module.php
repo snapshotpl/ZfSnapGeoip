@@ -4,10 +4,11 @@ namespace ZfSnapGeoip;
 
 use Zend\Console\Adapter\AdapterInterface;
 use Zend\EventManager\EventInterface;
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface as ConsoleUsage;
-use Zend\ModuleManager\Feature\ConfigProviderInterface as Config;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface as Autoloader;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface as BootstrapListener;
+use Zend\ModuleManager\Feature\ConfigProviderInterface as Config;
+use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface as ConsoleUsage;
+use Zend\Mvc\MvcEvent;
 
 /**
  * Geoip module
@@ -57,11 +58,11 @@ class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
     }
 
     /**
-     * @param EventInterface $e
+     * @param EventInterface $event
      */
-    public function onBootstrap(EventInterface $e)
+    public function onBootstrap(MvcEvent $event)
     {
-        $serviceManager = $e->getParam('application')->getServiceManager();
+        $serviceManager = $event->getApplication()->getServiceManager();
         $config = $serviceManager->get('config');
 
         require_once $config['maxmind']['timezone_function_path'];
