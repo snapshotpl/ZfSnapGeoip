@@ -1,4 +1,4 @@
-ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?branch=master)](https://travis-ci.org/snapshotpl/ZfSnapGeoip)
+ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?branch=master)](https://travis-ci.org/snapshotpl/ZfSnapGeoip) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/snapshotpl/ZfSnapGeoip/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/snapshotpl/ZfSnapGeoip/?branch=master)
 ===========
 
 Maxmind Geoip module for Zend Framework 2
