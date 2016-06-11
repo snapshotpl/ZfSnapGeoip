@@ -11,7 +11,6 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventManager;
 use Zend\Http\PhpEnvironment\Request as HttpRequest;
 use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use geoiprecord as GeoipCoreRecord;
 
 /**
@@ -19,7 +18,7 @@ use geoiprecord as GeoipCoreRecord;
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
-class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
+class Geoip implements EventManagerAwareInterface
 {
     /**
      * @var \GeoIP
@@ -55,6 +54,15 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
      * @var array
      */
     private $regions;
+
+    /**
+     * Geoip constructor.
+     * @param ServiceManager $serviceManager
+     */
+    public function __construct(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
 
     /**
      * Destructor
@@ -242,14 +250,6 @@ class Geoip implements ServiceManagerAwareInterface, EventManagerAwareInterface
             }
         }
         return null;
-    }
-
-    /**
-     * @param ServiceManager $serviceManager
-     */
-    public function setServiceManager(ServiceManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
     }
 
     /**
