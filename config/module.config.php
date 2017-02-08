@@ -19,26 +19,29 @@ return array(
     'service_manager' => array(
         'invokables' => array(
             'geoip_record' => 'ZfSnapGeoip\Entity\Record',
-            'geoip_hydrator' => 'Zend\Stdlib\Hydrator\ClassMethods',
-            'ZfSnapGeoip\HttpClient\Adapter' => 'Zend\Http\Client\Adapter\Curl',
+            'geoip_hydrator' => Zend\Stdlib\Hydrator\ClassMethods::class,
+            'ZfSnapGeoip\HttpClient\Adapter' => Zend\Http\Client\Adapter\Curl::class,
         ),
         'factories' => array(
-            'geoip' => 'ZfSnapGeoip\Service\GeoipFactory',
-            'ZfSnapGeoip\DatabaseConfig' => 'ZfSnapGeoip\DatabaseConfigFactory',
-            'ZfSnapGeoip\HttpClient' => 'ZfSnapGeoip\HttpClientFactory',
+            'geoip' => ZfSnapGeoip\Service\GeoipFactory::class,
+            'ZfSnapGeoip\DatabaseConfig' => ZfSnapGeoip\DatabaseConfigFactory::class,
+            'ZfSnapGeoip\HttpClient' => ZfSnapGeoip\HttpClientFactory::class,
         ),
         'shared' => array(
             'geoip_record' => false,
         ),
     ),
     'view_helpers' => array(
-        'invokables' => array(
-            'geoip' => 'ZfSnapGeoip\View\Helper\Geoip',
+        'factories' => array(
+            ZfSnapGeoip\View\Helper\Geoip::class => ZfSnapGeoip\View\Helper\GeoipFactory::class,
         ),
+        'aliases' => [
+            'geoip' => ZfSnapGeoip\View\Helper\Geoip::class,
+        ],
     ),
     'controllers' => array(
         'factories' => array(
-            'ZfSnapGeoip\Controller\Console' => 'ZfSnapGeoip\Controller\ConsoleControllerFactory',
+            'ZfSnapGeoip\Controller\Console' => ZfSnapGeoip\Controller\ConsoleControllerFactory::class,
         ),
     ),
     'console' => array(

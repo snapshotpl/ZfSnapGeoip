@@ -4,6 +4,7 @@ namespace ZfSnapGeoipTest\Service;
 
 use PHPUnit_Framework_TestCase;
 use ZfSnapGeoip\Entity\RecordInterface;
+use ZfSnapGeoip\IpAwareInterface;
 use ZfSnapGeoip\Service\Geoip;
 use ZfSnapGeoipTest\Bootstrap;
 
@@ -35,7 +36,7 @@ class GeoipTest extends PHPUnit_Framework_TestCase
 
     public function testValidTestDependencies()
     {
-        $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $this->geoip);
+        $this->assertInstanceOf(Geoip::class, $this->geoip);
     }
 
     public function testCountryCode()
@@ -124,7 +125,7 @@ class GeoipTest extends PHPUnit_Framework_TestCase
 
     private function getIpAwareInterfaceImplementation($ip)
     {
-        $ipIterface = $this->getMockBuilder('\ZfSnapGeoip\IpAwareInterface')->getMock();
+        $ipIterface = $this->getMockBuilder(IpAwareInterface::class)->getMock();
 
         $ipIterface->expects($this->any())
                 ->method('getIpAddress')

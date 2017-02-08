@@ -2,12 +2,12 @@
 
 namespace ZfSnapGeoip\Service;
 
-use Zend\ServiceManager\ServiceManager;
+use Interop\Container\ContainerInterface;
 
-class GeoipFactory
+final class GeoipFactory
 {
-    public function __invoke(ServiceManager $serviceManager)
+    public function __invoke(ContainerInterface $container)
     {
-        return new Geoip($serviceManager);
+        return new Geoip($container);
     }
 }
