@@ -1,16 +1,42 @@
 language: php
 
-php:
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.3
+      env: DEPS=lowest
+    - php: 5.3
+      env: DEPS=latest
+    - php: 5.4
+      env: DEPS=lowest
+    - php: 5.4
+      env: DEPS=latest
+    - php: 5.5
+      env: DEPS=lowest
+    - php: 5.5
+      env: DEPS=latest
+    - php: 5.6
+      env: DEPS=lowest
+    - php: 5.6
+      env: DEPS=latest
+    - php: 7.0
+      env: DEPS=lowest
+    - php: 7.0
+      env: DEPS=latest
+    - php: 7.1
+      env: DEPS=lowest
+    - php: 7.1
+      env: DEPS=latest
+    - php: hhvm
+      env: DEPS=lowest
+    - php: hhvm
+      env: DEPS=latest
+
+install:
+  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
+  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
 
 before_script:
-  - wget http://getcomposer.org/composer.phar
-  - php composer.phar install
   - wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -P data/
   - gunzip -f data/GeoLiteCity.dat.gz
 
