@@ -16,7 +16,6 @@ class Bootstrap
 
     public static function init()
     {
-        Console::overrideIsConsole(false);
         // Load the user-defined test configuration file, if it exists; otherwise, load
         if (is_readable(__DIR__ . '/../ApplicationConfig.php')) {
             $testConfig = include __DIR__ . '/../ApplicationConfig.php';
@@ -36,6 +35,8 @@ class Bootstrap
         $zf2ModulePaths .= getenv('ZF2_MODULES_TEST_PATHS') ?: (defined('ZF2_MODULES_TEST_PATHS') ? ZF2_MODULES_TEST_PATHS : '');
 
         static::initAutoloader();
+
+        Console::overrideIsConsole(false);
 
         // use ModuleManager to load this module and it's dependencies
         $baseConfig = array(
