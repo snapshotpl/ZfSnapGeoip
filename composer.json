@@ -28,6 +28,7 @@
         "zendframework/zend-serializer": "~2.2",
         "zendframework/zend-log": "~2.2",
         "zendframework/zend-i18n": "~2.2",
+        "zendframework/zend-config": "~2.2",
         "phpunit/phpunit": "~3.7"
     },
     "autoload": {

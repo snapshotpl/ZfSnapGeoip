@@ -2,17 +2,20 @@
 
 namespace ZfSnapGeoipTest\Service;
 
-use \ZfSnapGeoipTest\Bootstrap;
+use PHPUnit_Framework_TestCase;
+use ZfSnapGeoip\Entity\RecordInterface;
+use ZfSnapGeoip\Service\Geoip;
+use ZfSnapGeoipTest\Bootstrap;
 
 /**
  * ServiceGeoipTest
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
-class GeoipTest extends \PHPUnit_Framework_TestCase
+class GeoipTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var ZfSnapGeoip\Service\Geoip
+     * @var Geoip
      */
     private $geoip;
 
@@ -104,7 +107,7 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     private function getRecordWithTrueIp()
     {
@@ -112,7 +115,7 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     private function getRecordWithLocalIp()
     {

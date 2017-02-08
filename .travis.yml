@@ -36,8 +36,4 @@ install:
   - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
   - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
 
-before_script:
-  - wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -P data/
-  - gunzip -f data/GeoLiteCity.dat.gz
-
 script: phpunit --configuration tests/
