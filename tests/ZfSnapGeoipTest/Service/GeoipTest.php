@@ -12,11 +12,6 @@ use \ZfSnapGeoipTest\Bootstrap;
 class GeoipTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Zend\ServiceManager\ServiceManager
-     */
-    private $sm;
-
-    /**
      * @var ZfSnapGeoip\Service\Geoip
      */
     private $geoip;
@@ -31,12 +26,13 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->sm = Bootstrap::getServiceManager();
-        $this->assertInstanceOf('\Zend\ServiceManager\ServiceManager', $this->sm);
+        $sm = Bootstrap::getServiceManager();
+        $this->geoip = $sm->get('geoip');
+    }
 
-        $geoip = $this->sm->get('geoip');
-        $this->geoip = $geoip;
-        $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $geoip);
+    public function testValidTestDependencies()
+    {
+        $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $this->geoip);
     }
 
     public function testCountryCode()
