@@ -2,22 +2,21 @@
 
 namespace ZfSnapGeoipTest;
 
+use RuntimeException;
+use UnexpectedValueException;
+use Zend\Console\Console;
 use Zend\Loader\AutoloaderFactory;
 use Zend\Mvc\Service\ServiceManagerConfig;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\ArrayUtils;
-use RuntimeException;
-
-error_reporting(E_ALL | E_STRICT);
-chdir(__DIR__);
 
 class Bootstrap
 {
-
     protected static $serviceManager;
 
     public static function init()
     {
+        Console::overrideIsConsole(false);
         // Load the user-defined test configuration file, if it exists; otherwise, load
         if (is_readable(__DIR__ . '/../ApplicationConfig.php')) {
             $testConfig = include __DIR__ . '/../ApplicationConfig.php';
@@ -108,7 +107,7 @@ function unzipFile($gzipPath, $destPath)
 {
     $gz = gzopen($gzipPath, 'rb');
     if (!$gz) {
-        throw new \UnexpectedValueException(
+        throw new UnexpectedValueException(
         'Could not open gzip file'
         );
     }
@@ -116,7 +115,7 @@ function unzipFile($gzipPath, $destPath)
     $dest = fopen($destPath, 'wb');
     if (!$dest) {
         gzclose($gz);
-        throw new \UnexpectedValueException(
+        throw new UnexpectedValueException(
         'Could not open destination file'
         );
     }
