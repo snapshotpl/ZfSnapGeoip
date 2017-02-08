@@ -21,10 +21,10 @@
         "zendframework/zend-eventmanager": "~2.2",
         "zendframework/zend-modulemanager": "~2.2",
         "zendframework/zend-servicemanager": "~2.2",
+        "zendframework/zend-mvc": "~2.2",
         "geoip/geoip": "^1.14"
     },
     "require-dev": {
-        "zendframework/zend-mvc": "~2.2",
         "zendframework/zend-serializer": "~2.2",
         "zendframework/zend-log": "~2.2",
         "zendframework/zend-i18n": "~2.2",
