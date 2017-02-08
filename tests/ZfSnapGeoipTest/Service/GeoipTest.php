@@ -2,22 +2,20 @@
 
 namespace ZfSnapGeoipTest\Service;
 
-use \ZfSnapGeoipTest\Bootstrap;
+use PHPUnit_Framework_TestCase;
+use ZfSnapGeoip\Entity\RecordInterface;
+use ZfSnapGeoip\Service\Geoip;
+use ZfSnapGeoipTest\Bootstrap;
 
 /**
  * ServiceGeoipTest
  *
  * @author Witold Wasiczko <witold@wasiczko.pl>
  */
-class GeoipTest extends \PHPUnit_Framework_TestCase
+class GeoipTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Zend\ServiceManager\ServiceManager
-     */
-    private $sm;
-
-    /**
-     * @var ZfSnapGeoip\Service\Geoip
+     * @var Geoip
      */
     private $geoip;
 
@@ -31,12 +29,13 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->sm = Bootstrap::getServiceManager();
-        $this->assertInstanceOf('\Zend\ServiceManager\ServiceManager', $this->sm);
+        $sm = Bootstrap::getServiceManager();
+        $this->geoip = $sm->get('geoip');
+    }
 
-        $geoip = $this->sm->get('geoip');
-        $this->geoip = $geoip;
-        $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $geoip);
+    public function testValidTestDependencies()
+    {
+        $this->assertInstanceOf('\ZfSnapGeoip\Service\Geoip', $this->geoip);
     }
 
     public function testCountryCode()
@@ -108,7 +107,7 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     private function getRecordWithTrueIp()
     {
@@ -116,7 +115,7 @@ class GeoipTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \ZfSnapGeoip\Entity\RecordInterface
+     * @return RecordInterface
      */
     private function getRecordWithLocalIp()
     {

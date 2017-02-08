@@ -2,14 +2,13 @@
 
 namespace ZfSnapGeoipTest;
 
+use RuntimeException;
+use UnexpectedValueException;
+use Zend\Console\Console;
 use Zend\Loader\AutoloaderFactory;
 use Zend\Mvc\Service\ServiceManagerConfig;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\ArrayUtils;
-use RuntimeException;
-
-error_reporting(E_ALL | E_STRICT);
-chdir(__DIR__);
 
 class Bootstrap
 {
@@ -33,9 +32,11 @@ class Bootstrap
         }
 
         $zf2ModulePaths = implode(PATH_SEPARATOR, $zf2ModulePaths) . PATH_SEPARATOR;
-        $zf2ModulePaths .= getenv('ZF2_MODULES_TEST_PATHS') ? : (defined('ZF2_MODULES_TEST_PATHS') ? ZF2_MODULES_TEST_PATHS : '');
+        $zf2ModulePaths .= getenv('ZF2_MODULES_TEST_PATHS') ?: (defined('ZF2_MODULES_TEST_PATHS') ? ZF2_MODULES_TEST_PATHS : '');
 
         static::initAutoloader();
+
+        Console::overrideIsConsole(false);
 
         // use ModuleManager to load this module and it's dependencies
         $baseConfig = array(
@@ -66,7 +67,7 @@ class Bootstrap
             $loader = include $vendorPath . '/autoload.php';
         }
 
-        $zf2Path = getenv('ZF2_PATH') ? : (defined('ZF2_PATH') ? ZF2_PATH : (is_dir($vendorPath . '/ZF2/library') ? $vendorPath . '/ZF2/library' : false));
+        $zf2Path = getenv('ZF2_PATH') ?: (defined('ZF2_PATH') ? ZF2_PATH : (is_dir($vendorPath . '/ZF2/library') ? $vendorPath . '/ZF2/library' : false));
 
         if (!$zf2Path) {
             throw new RuntimeException('Unable to load ZF2. Run `php composer.phar install` or define a ZF2_PATH environment variable.');
@@ -101,7 +102,56 @@ class Bootstrap
         }
         return $dir . '/' . $path;
     }
+}
 
+function unzipFile($gzipPath, $destPath)
+{
+    $gz = gzopen($gzipPath, 'rb');
+    if (!$gz) {
+        throw new UnexpectedValueException(
+        'Could not open gzip file'
+        );
+    }
+
+    $dest = fopen($destPath, 'wb');
+    if (!$dest) {
+        gzclose($gz);
+        throw new UnexpectedValueException(
+        'Could not open destination file'
+        );
+    }
+
+    stream_copy_to_stream($gz, $dest);
+
+    gzclose($gz);
+    fclose($dest);
+}
+
+function downloadFile($url, $path)
+{
+    $newfname = $path;
+    $file = fopen($url, 'rb');
+    if ($file) {
+        $newf = fopen($newfname, 'wb');
+        if ($newf) {
+            while (!feof($file)) {
+                fwrite($newf, fread($file, 1024 * 8), 1024 * 8);
+            }
+        }
+    }
+    if ($file) {
+        fclose($file);
+    }
+    if ($newf) {
+        fclose($newf);
+    }
+}
+if (!file_exists(__DIR__ . '/../../data/GeoLiteCity.dat')) {
+    $gzip = __DIR__ . '/../../data/GeoLiteCity.dat.gz';
+    $dat = __DIR__ . '/../../data/GeoLiteCity.dat';
+    downloadFile('http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz', $gzip);
+    unzipFile($gzip, $dat);
+    unlink($gzip);
 }
 
 Bootstrap::init();
