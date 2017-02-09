@@ -23,10 +23,10 @@ class GeoipTest extends PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    private $ip = array(
+    private $ip = [
         'local' => '192.168.0.1',
         'google' => '216.239.51.99',
-    );
+    ];
 
     protected function setUp()
     {

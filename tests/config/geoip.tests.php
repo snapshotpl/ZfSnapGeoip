@@ -1,10 +1,10 @@
 <?php
 
-return array(
-    'maxmind' => array(
-        'database' => array(
+return [
+    'maxmind' => [
+        'database' => [
             'destination' => __DIR__ . '/../../data/',
             'regionvars' => __DIR__ . '/../../vendor/geoip/geoip/src/geoipregionvars.php',
-        ),
-    ),
-);
+        ],
+    ],
+];

@@ -16,6 +16,7 @@ use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface as ConsoleUsage;
  */
 class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
 {
+
     const CONSOLE_GEOIP_DOWNLOAD = 'geoip download [--no-clobber] [-q]';
 
     /**
@@ -31,13 +32,13 @@ class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Zend\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -48,12 +49,11 @@ class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
      */
     public function getConsoleUsage(AdapterInterface $console)
     {
-        return array(
-            'Manage GeoIP database',
+        return ['Manage GeoIP database',
             self::CONSOLE_GEOIP_DOWNLOAD => 'Downloads the newest GeoIP db',
-            array('--no-clobber', 'Don\'t overwrite an existing db file'),
-            array('-q', 'Turn off output'),
-        );
+            ['--no-clobber', 'Don\'t overwrite an existing db file'],
+            ['-q', 'Turn off output'],
+        ];
     }
 
     /**
@@ -66,5 +66,4 @@ class Module implements ConsoleUsage, Config, Autoloader, BootstrapListener
 
         require_once $config['maxmind']['timezone_function_path'];
     }
-
 }

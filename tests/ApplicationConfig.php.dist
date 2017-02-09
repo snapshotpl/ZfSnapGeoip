@@ -1,14 +1,13 @@
 <?php
-
 define('ZF2_PATH', __DIR__ . '/../vendor/zendframework/zendframework/library');
 
-return array(
-    'modules' => array(
+return [
+    'modules' => [
         'ZfSnapGeoip',
-    ),
-    'module_listener_options' => array(
-        'config_glob_paths' => array(
+    ],
+    'module_listener_options' => [
+        'config_glob_paths' => [
             __DIR__ . '/config/{,*.}tests.php',
-        ),
-    ),
-);
+        ],
+    ],
+];
