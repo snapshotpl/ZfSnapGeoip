@@ -43,7 +43,7 @@ return [
             ZfSnapGeoip\Controller\ConsoleController::class => ZfSnapGeoip\Controller\ConsoleControllerFactory::class,
         ],
         'aliases' => [
-            'ZfSnapGeoip\Controller\Console',
+            'ZfSnapGeoip\Controller\Console' => ZfSnapGeoip\Controller\ConsoleController::class,
         ],
     ],
     'console' => [
