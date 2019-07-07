@@ -15,13 +15,17 @@ matrix:
       env: DEPS=lowest
     - php: 7.1
       env: DEPS=latest
-    - php: hhvm
+    - php: 7.2
       env: DEPS=lowest
-    - php: hhvm
+    - php: 7.2
+      env: DEPS=latest
+    - php: 7.3
+      env: DEPS=lowest
+    - php: 7.3
       env: DEPS=latest
 
 install:
-  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction --prefer-source ; fi
-  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-source --prefer-lowest ; fi
+  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update --no-interaction ; fi
+  - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --no-interaction --prefer-lowest ; fi
 
 script: phpunit --configuration tests/

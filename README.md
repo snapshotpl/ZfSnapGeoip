@@ -1,7 +1,7 @@
 ZfSnapGeoip [![Build Status](https://travis-ci.org/snapshotpl/ZfSnapGeoip.png?branch=master)](https://travis-ci.org/snapshotpl/ZfSnapGeoip) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/snapshotpl/ZfSnapGeoip/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/snapshotpl/ZfSnapGeoip/?branch=master)
 ===========
 
-Maxmind Geoip module for Zend Framework 2
+Maxmind Geoip module for Zend Framework 3
 
 Created by Witold Wasiczko
 
@@ -74,12 +74,8 @@ ZfSnapGeoip\Service\Geoip | getRegions | After first loading regions names | reg
 How to install?
 ---------------
 Via [composer.json](https://getcomposer.org/)
-```json
-{
-    "require": {
-        "snapshotpl/zf-snap-geoip": "2.*"
-    }
-}
+```bash
+composer require snapshotpl/zf-snap-geoip
 ```
 
 and add `ZfSnapGeoip` module name to application.config.php
