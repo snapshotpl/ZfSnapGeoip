@@ -2,6 +2,7 @@
 
 namespace ZfSnapGeoip;
 
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -12,13 +13,16 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class DatabaseConfigFactory implements FactoryInterface
 {
-
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $config = $serviceLocator->get('config');
+        return $this($serviceLocator, DatabaseConfig::class);
+    }
+
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        $config = $container->get('config');
         $data = $config['maxmind']['database'];
 
         return new DatabaseConfig($data);
     }
-
 }

@@ -12,6 +12,7 @@ use Zend\Stdlib\ArrayUtils;
 
 class Bootstrap
 {
+
     protected static $serviceManager;
 
     public static function init()
@@ -23,7 +24,7 @@ class Bootstrap
             $testConfig = include __DIR__ . '/../ApplicationConfig.php.dist';
         }
 
-        $zf2ModulePaths = array(dirname(dirname(__DIR__)));
+        $zf2ModulePaths = [dirname(dirname(__DIR__))];
         if (($path = static::findParentPath('vendor'))) {
             $zf2ModulePaths[] = $path;
         }
@@ -39,15 +40,18 @@ class Bootstrap
         Console::overrideIsConsole(false);
 
         // use ModuleManager to load this module and it's dependencies
-        $baseConfig = array(
-            'module_listener_options' => array(
+        $baseConfig = [
+            'module_listener_options' => [
                 'module_paths' => explode(PATH_SEPARATOR, $zf2ModulePaths),
-            ),
-        );
+            ],
+        ];
 
         $applicationConfig = ArrayUtils::merge($baseConfig, $testConfig);
 
-        $serviceManager = new ServiceManager(new ServiceManagerConfig());
+        $serviceManagerConfig = new ServiceManagerConfig();
+
+        $serviceManager = new ServiceManager();
+        $serviceManagerConfig->configureServiceManager($serviceManager);
         $serviceManager->setService('ApplicationConfig', $applicationConfig);
         $serviceManager->get('ModuleManager')->loadModules();
 
@@ -77,14 +81,14 @@ class Bootstrap
             $loader->add('Zend', $zf2Path . '/Zend');
         } else {
             include $zf2Path . '/Zend/Loader/AutoloaderFactory.php';
-            AutoloaderFactory::factory(array(
-                'Zend\Loader\StandardAutoloader' => array(
+            AutoloaderFactory::factory([
+                'Zend\Loader\StandardAutoloader' => [
                     'autoregister_zf' => true,
-                    'namespaces' => array(
+                    'namespaces' => [
                         __NAMESPACE__ => __DIR__ . '/' . __NAMESPACE__,
-                    ),
-                ),
-            ));
+                    ],
+                ],
+            ]);
         }
     }
 

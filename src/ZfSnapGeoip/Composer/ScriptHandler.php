@@ -20,9 +20,9 @@ class ScriptHandler
      */
     public static function downloadData(Event $event)
     {
-        $defaultOptions = array(
+        $defaultOptions = [
             self::ZEND_INDEX_PATH => 'public/index.php',
-        );
+            ];
         $newOptions = $event->getComposer()->getPackage()->getExtra();
         $options = array_merge($defaultOptions, $newOptions);
         $zendIndexPath = $options[self::ZEND_INDEX_PATH];
